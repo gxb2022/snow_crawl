@@ -57,9 +57,18 @@ class SpInfo:
     id = None
     odd = None
 
+    @classmethod
+    def __change_odd(cls, odd):
+        try:
+            return round(float(odd), 2)
+        except TypeError:
+            return odd
+        except ValueError:
+            return odd
+
     def __setattr__(self, name, value):
         if name == 'odd':
-            value = round(float(value), 2) if value else None  # 统一转换成两位小数
+            value = self.__change_odd(value)
         if name == 'data':
             if not isinstance(value, list):
                 raise TypeError(f"data字段 必须要是一个列表,而不是{type(value)}")

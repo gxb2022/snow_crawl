@@ -18,7 +18,7 @@ class VbFootballSpider(VbMinix):
     @classmethod
     def get_map_odd_field(cls):
         map_odd1 = {
-            'whole': "", 'half1': None, 'half2': None
+            'whole': "", 'half1': "1st", 'half2': None
         }
         map_odd2 = {
             'sf': None,
@@ -26,8 +26,8 @@ class VbFootballSpider(VbMinix):
             'hp': "ah",
             'ou': "ou",
             'oe': "oe",
-            'ht_ou': None,
-            'gt_ou': None,
+            'ht_ou': "h-ou",
+            'gt_ou': "a-ou",
             'jq_sfp': None,
             'jq_hp': None,
             'jq_ou': None,
@@ -38,8 +38,8 @@ class VbFootballSpider(VbMinix):
             'fp_ou': None,
             'csb': "cs",
             'tgs': "tg",
-            'bs_gs': None,
-            'gd': None,
+            'bs_gs': "btts",
+            'gd': "winm",
             'first_1': None,
             'first_jq_1': None
         }
@@ -53,34 +53,37 @@ class VbFootballSpider(VbMinix):
                 key = f"{j2}{j1}" if j1 == '' else f"{j2}_{j1}"
                 value = f'{i1}_{i2}'
                 map_odd[key] = value
+        map_odd_ex = {
+            "ou_1st#cr": "half1_jq_ou",
+            "ah_1st#cr": "half1_jq_hp",
+            "ou#cr": "whole_jq_ou",
+            "ah#cr": "whole_jq_hp",
+        }
+        print(map_odd)
+        map_odd.update(map_odd_ex)
         return map_odd
 
     def gen_item_odd_data(self, one_bs_data, **kwargs) -> OddData():
         obj = self.odd_data_obj()
         # lp_ 最后得分 adh_ 胜负平
-        skip_field = []
+        skip_field = ["t", "&", "wb", "oe#cr"]
         market = one_bs_data["market"]
         for field, field_data in market.items():
-            print(111111)
             if [i for i in skip_field if i in field]:
                 self.sports_logger.debug(f'放弃提取的字段：{field}')
                 continue
             model_field = self.map_odd_field.get(field)
-            self.sports_logger.debug(f'success识别字段:{field},对应模型字段:{model_field}')
             if field not in self.map_odd_field:
                 self.sports_logger.error(f'无法识别字段:{field}')
                 continue
-
-            continue
+            print(f'success识别字段:{field},对应模型字段:{model_field}')
             data_list = [field_data] if isinstance(field_data, dict) else field_data
             sp_info_list = []
             for data in data_list:
                 sp_info = SpInfo()
                 odd = data.pop("k", None)
-
-                if '/' in str(odd):
-                    odd = None
-                sp_info.odd = odd
+                data.pop("absK", None)
+                sp_info.odd = self.change_odd(odd)
                 sp_data_list = []
                 for i, j in data.items():
                     one_sp_data = OneSpData()
@@ -94,8 +97,22 @@ class VbFootballSpider(VbMinix):
             setattr(obj, model_field, sp_info_list)
         return obj
 
+    @classmethod
+    def change_odd(cls, odd):
+        parts = str(odd).split('/')
+        if len(parts) == 2:
+            home_handicap = float(parts[0])
+            away_handicap = float(parts[1])
+            sign = 1 if home_handicap >= 0 else -1
+            absolute_value = abs(home_handicap)
+            numeric_value = (away_handicap - absolute_value) / 2 + absolute_value
+            return numeric_value * sign
+        else:
+            return odd
+
 
 if __name__ == '__main__':
+    VbFootballSpider.get_map_odd_field()
     from scrapy.crawler import CrawlerProcess
     from scrapy.utils.project import get_project_settings
 
@@ -103,7 +120,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbFootballSpider, ball_time='today')
+    process.crawl(VbFootballSpider, ball_time='live')
 
     # 启动爬虫
     process.start()
