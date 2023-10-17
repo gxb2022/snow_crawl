@@ -6,7 +6,7 @@ class BtiBasketballSpider(BtiMinix):
     ball = 'basketball'
     name = f'bti_basketball'
 
-    item = BasketballItem
+    item_obj = BasketballItem
     odd_data_obj = BasketballOddData
     score_data_obj = BasketballScoreData
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(BtiBasketballSpider, ball_time='today')
+    process.crawl(BtiBasketballSpider, ball_time='today', detail_requests=True)
 
     # 启动爬虫
     process.start()

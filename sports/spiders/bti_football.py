@@ -5,15 +5,9 @@ from sports.spiders.bti import *
 class BtiFootballSpider(BtiMinix):
     ball = 'football'
     name = f'bti_football'
-    item = FootballItem
+    item_obj = FootballItem
     odd_data_obj = FootballOddData
     score_data_obj = FootballScoreData
-
-    def __init__(self, **kwargs):
-
-        super().__init__(**kwargs)
-        self.detail_requests = False
-        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, level='INFO')
 
     @classmethod
     def get_map_odd_field(cls):
@@ -65,7 +59,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(BtiFootballSpider, ball_time='live')
+    process.crawl(BtiFootballSpider, ball_time='tomorrow')
 
     # 启动爬虫
     process.start()

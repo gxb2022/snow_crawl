@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import abc
+import copy
 import json
 import os
 
@@ -31,6 +32,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         self.check_parameters()
         # 日志记录
         self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='WARNING')
+        self.is_detail_requests = False
 
     def check_parameters(self):
         if self.api not in self.support_api_list:
@@ -48,7 +50,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         yield item
         # 赛选需要获取详细数据的bs_id
         if self.detail_requests is True:
-            yield from self.yield_detail_requests(one_bs_data, item)
+            yield from self.yield_detail_requests(one_bs_data, copy.deepcopy(item))
 
     @abc.abstractmethod
     def yield_detail_requests(self, one_bs_data, item: SportsItem):
@@ -82,7 +84,6 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         return score_data_obj
 
     def test_save_json_data(self, raw_data, bs_id="ALL"):
-        print(f'spider_path:{spider_path}')
         file_name = f'{spider_path}/test_data/{self.api}_{self.ball}_{self.ball_time}_{bs_id}.json'
         with open(file_name, 'w', encoding='utf-8') as f:
             f.write(json.dumps(raw_data, ensure_ascii=False))

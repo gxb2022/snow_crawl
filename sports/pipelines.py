@@ -36,15 +36,12 @@ class SportsPipeline:
         odd_data = item['odd_data']
         score_data = item['score_data']
         bs_id = bs_data['bs_id']
-
+        self.bs_data_dict[bs_id] = bs_data
+        self.odd_data_dict[bs_id] = odd_data
+        self.score_data_dict[bs_id] = score_data
         if detail_requests:
             # 存在网络延时 实时保存
             self.save_detail_data(bs_id, bs_data, odd_data, score_data)
-        else:
-            # 无网络延时 批量保存
-            self.bs_data_dict[bs_id] = bs_data
-            self.odd_data_dict[bs_id] = odd_data
-            self.score_data_dict[bs_id] = score_data
         return item
 
     def save_detail_data(self, bs_id, bs_data, odd_data, score_data):
@@ -93,13 +90,12 @@ class SportsPipeline:
         }
         name = f'detail_spider_state' if spider.detail_requests is True else f'spider_state'
         self.pipe.hset(name=name, key=f'{self.ball}&{self.api}&{self.ball_time}', value=json.dumps(run_state))
-        spider.sports_logger.warning(f'{spider.detail_requests},爬虫关闭,总数量:[{bs_data_num}]')
+        spider.sports_logger.warning(f'detail_requests:{spider.detail_requests},爬虫关闭,总数量:[{bs_data_num}]')
         # 执行管道中的命令
         self.pipe.execute()
 
     def close_spider(self, spider):
-        if spider.detail_requests is not True:
-            self.save_data()
+        self.save_data()
         self.save_run_state(spider)
 
 

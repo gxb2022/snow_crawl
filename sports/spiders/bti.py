@@ -1,7 +1,6 @@
 # -- coding: utf-8 --
 import datetime
 
-
 from sports.spiders.abc_spider import *
 
 
@@ -10,6 +9,7 @@ class BtiMinix(AbcSpider):
     host = 'demo-light.bti.bet'
     # 测试
     host_list = ['https://demo-light.bti.bet/zh', 'prod20082-23705321.bti-SportsProject.io']
+    bti_cookie_path = f'{spider_path}/cookie/bti_cookie.json'
 
     def __init__(self, ball_time, **kwargs):
         super().__init__(ball_time, **kwargs)
@@ -24,8 +24,7 @@ class BtiMinix(AbcSpider):
         yield scrapy.Request(url=url, headers=headers, callback=self.parse, errback=self.handle_error)
 
     def get_headers(self):
-        bti_cookie_path = f'{spider_path}/cookie/bti_cookie.json'
-        with open(bti_cookie_path, 'r', encoding='utf-8') as f:
+        with open(self.bti_cookie_path, 'r', encoding='utf-8') as f:
             cookie = json.loads(f.read())
         headers = {
             'Host': self.host,
@@ -62,7 +61,6 @@ class BtiMinix(AbcSpider):
 
     def parse(self, response, **kwargs):
         raw_data = response.json()
-        ball_time = response.meta.get("ball_time")
         league_data_list = raw_data.get('serializedData', [])
         self.test_save_json_data(raw_data)
         for league_data in league_data_list:
