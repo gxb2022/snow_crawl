@@ -48,6 +48,39 @@ class VbBasketballSpider(VbMinix):
             setattr(obj, model_field, sp_info_list)
         return obj
 
+    def gen_item_score_data(self, one_bs_data, **kwargs) -> ScoreData():
+        def time_string_to_seconds(time_str):
+            try:
+                minutes, seconds = map(int, time_str.split(":"))
+                total_seconds = minutes * 60 + seconds
+                return total_seconds
+            except ValueError:
+                return time_str
+        map_odd1 = {
+            'whole': "",
+            'half1': "1st",
+            'half2': "2nd",
+            'th1': "q1",
+            'th2': "q2",
+            'th3': "q3",
+            'th4': "q4"
+        }
+        map_odd1 = {j: i for i, j in map_odd1.items()}
+        detail = one_bs_data.get("detail", {})
+        obj = self.score_data_obj()
+        obj.period = map_odd1.get(detail["period"])
+        remain_timestamp_str = detail.get("time")
+        obj.remain_timestamp_str = remain_timestamp_str
+        obj.remain_timestamp = time_string_to_seconds(remain_timestamp_str)
+        obj.whole = str(detail.get("score")).split('-')
+        obj.half1 = str(detail["1h"]).split('-')
+        obj.half2 = str(detail["2h"]).split('-')
+        obj.th1 = str(detail["q1"]).split('-')
+        obj.th2 = str(detail["q2"]).split('-')
+        obj.th3 = str(detail["q3"]).split('-')
+        obj.th4 = str(detail["q4"]).split('-')
+        return obj
+
     @classmethod
     def get_map_odd_field(cls):
         map_odd1 = {
@@ -91,6 +124,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbBasketballSpider, ball_time='tomorrow')
+    process.crawl(VbBasketballSpider, ball_time='live')
     # 启动爬虫
     process.start()

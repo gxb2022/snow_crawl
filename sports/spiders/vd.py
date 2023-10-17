@@ -96,7 +96,6 @@ class VbMinix(AbcSpider):
     def gen_item_score_data(self, one_bs_data, **kwargs) -> ScoreData():
         return self.score_data_obj()
 
-    @abc.abstractmethod
     def gen_item_odd_data(self, one_bs_data, **kwargs) -> OddData():
         obj = self.odd_data_obj()
         return obj

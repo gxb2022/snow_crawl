@@ -36,10 +36,11 @@ class BtiFootballSpider(BtiMinix):
         # whole
         map_score_time = {23: 'half1', 24: 'half2', 25: '中场'}
 
-        setattr(score_data_obj, 'score_time', [one_bs_data[7][2], map_score_time.get(one_bs_data[7][3])])
+        score_data_obj.remain_timestamp = one_bs_data[7][2]
+        score_data_obj.period = map_score_time.get(one_bs_data[7][3])
         if one_bs_data[7][3] == 24:
-            setattr(score_data_obj, 'score_time', [one_bs_data[7][2], 'whole'])
-        setattr(score_data_obj, 'whole', [int(one_bs_data[4][0]), int(one_bs_data[4][1])])
+            score_data_obj.period = 'whole'
+        score_data_obj.whole = [int(one_bs_data[4][0]), int(one_bs_data[4][1])]
         map_score = {
             'half1': 'firstHalfScore',
             'half2': 'secondHalfScore',

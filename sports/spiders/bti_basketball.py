@@ -48,10 +48,10 @@ class BtiBasketballSpider(BtiMinix):
         raw_score_data: dict = one_bs_data[4][3]
         if not raw_score_data:
             return score_data_obj
-        # whole
         map_score_time = {14: 'th1', 16: 'th2', 18: 'th3', 20: 'th4'}
-        setattr(score_data_obj, 'score_time', [one_bs_data[7][2], map_score_time.get(one_bs_data[7][3])])
-        setattr(score_data_obj, 'whole', [int(one_bs_data[4][0]), int(one_bs_data[4][1])])
+        score_data_obj.remain_timestamp = one_bs_data[7][2]
+        score_data_obj.period = map_score_time.get(one_bs_data[7][3])
+        score_data_obj.whole = [int(one_bs_data[4][0]), int(one_bs_data[4][1])]
         map_score = {
             'half1': 'basketballFirstHalfScore',
             'half2': 'basketballSecondHalfScore',

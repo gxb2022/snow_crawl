@@ -197,6 +197,9 @@ class FootballOddData(OddData):
 
 
 class ScoreData:
+    period = "当前时期"
+    remain_timestamp = "剩下时间戳"
+    remain_timestamp_str = "当前时期剩余时间"
 
     def __setattr__(self, name, value):
         super().__setattr__(name, value)
@@ -207,7 +210,6 @@ class ScoreData:
 
 
 class BasketballScoreData(ScoreData):
-    score_time = '比分时间'
     whole = '全场'
     half1 = '上全场'
     half2 = '下全场'
