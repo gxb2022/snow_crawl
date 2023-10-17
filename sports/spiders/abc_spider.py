@@ -43,8 +43,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
             raise ValueError(f'{self.ball_time} must into {self.support_ball_time_list}')
 
     def handle_one_bs_data(self, item: SportsItem, one_bs_data, **kwargs):
-        item_bs_data = self.gen_item_bs_data(one_bs_data, **kwargs)
-        item['bs_data'] = item_bs_data
+        item['bs_data'] = self.gen_item_bs_data(one_bs_data, **kwargs)
         item['odd_data'] = self.gen_item_odd_data(one_bs_data, **kwargs)
         item['score_data'] = self.gen_item_score_data(one_bs_data, **kwargs)
         yield item

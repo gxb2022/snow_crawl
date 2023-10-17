@@ -4,7 +4,6 @@ from sports.spiders.fb import *
 
 
 class FbFootballSpider(FbMinix):
-    """"""
     ball = 'football'
     name = f'fb_football'
     item_obj = FootballItem
