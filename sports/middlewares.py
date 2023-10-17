@@ -57,7 +57,7 @@ class SportsDownloaderMiddleware:
         res = session.get(url, headers={'User-Agent': user_agent}, timeout=10)
         if res.status_code == 200:
             cookie = session.cookies.get_dict()
-            bti_cookie_path = f'{spider.dir_path}/cookie/bti_cookie.json'
+            bti_cookie_path = f'{spider.spider_path}/cookie/bti_cookie.json'
             with open(bti_cookie_path, 'w', encoding='utf-8') as f:
                 f.write(json.dumps(cookie))
             spider.sports_logger.warning(f'Success update local cookie')

@@ -64,7 +64,7 @@ class BtiMinix(AbcSpider):
         raw_data = response.json()
         ball_time = response.meta.get("ball_time")
         league_data_list = raw_data.get('serializedData', [])
-        self.test_save_json_data(ball_time, raw_data)
+        self.test_save_json_data(raw_data)
         for league_data in league_data_list:
             league = league_data[8]
             bs_data_list = league_data[12]

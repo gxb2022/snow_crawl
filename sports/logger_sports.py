@@ -10,9 +10,9 @@ dir_path = os.path.dirname(dir_path)
 
 class LoggerSports:
 
-    def __init__(self, ball, api, level='DEBUG'):
+    def __init__(self, ball, api, ball_time, level='DEBUG'):
 
-        log_name = f'{ball}_{api}'
+        log_name = f'{ball}_{api}_{ball_time}'
         formatter_str = f'%(asctime)s [{ball}_{api}] %(levelname)s: %(message)s'
 
         if log_name in loggers:
@@ -58,10 +58,9 @@ class LoggerSports:
 
 
 if __name__ == '__main__':
-    log = LoggerSports(ball='football', api='fb')
+    log = LoggerSports(ball='football', api='fb', ball_time='live')
     log.debug('debug')
     log.info('info')
     log.warning('警告')
     log.error('报错')
     log.critical('严重')
-

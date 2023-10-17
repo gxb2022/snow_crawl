@@ -3,7 +3,6 @@ import abc
 import json
 import os
 
-
 from sports.items import *
 from sports.sports_model import *
 from sports.logger_sports import LoggerSports
@@ -23,8 +22,6 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
     item_obj = SportsItem
     odd_data_obj = OddData
     score_data_obj = ScoreData
-    # 日志记录
-    sports_logger = LoggerSports(ball=ball, api=api, level='WARNING')
 
     def __init__(self, ball_time, detail_requests=False, **kwargs):
         super().__init__(**kwargs)
@@ -32,6 +29,8 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         self.detail_requests = detail_requests
         self.detail_requests_num = 0
         self.check_parameters()
+        # 日志记录
+        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='WARNING')
 
     def check_parameters(self):
         if self.api not in self.support_api_list:
@@ -83,6 +82,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         return score_data_obj
 
     def test_save_json_data(self, raw_data, bs_id="ALL"):
+        print(f'spider_path:{spider_path}')
         file_name = f'{spider_path}/test_data/{self.api}_{self.ball}_{self.ball_time}_{bs_id}.json'
         with open(file_name, 'w', encoding='utf-8') as f:
             f.write(json.dumps(raw_data, ensure_ascii=False))
