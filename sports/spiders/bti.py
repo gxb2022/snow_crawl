@@ -24,7 +24,7 @@ class BtiMinix(AbcSpider):
         yield scrapy.Request(url=url, headers=headers, callback=self.parse, errback=self.handle_error)
 
     def get_headers(self):
-        bti_cookie_path = f'sports/spiders/cookie/bti_cookie.json'
+        bti_cookie_path = f'{spider_path}/cookie/bti_cookie.json'
         with open(bti_cookie_path, 'r', encoding='utf-8') as f:
             cookie = json.loads(f.read())
         headers = {
