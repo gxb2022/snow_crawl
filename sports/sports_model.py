@@ -11,7 +11,7 @@ class Api:
     @classmethod
     def get_api_list(cls):
         """返回排序后的列表"""
-        return ["fb", "bti", "pm", "vd"]
+        return ["fb", "bti", "vd"]
 
 
 class Ball:
