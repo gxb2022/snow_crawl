@@ -48,8 +48,7 @@ class RunSpider:
     def run(self):
         threads = []
         for i in self.spider_class_list:
-            # for j in ['live', 'today', 'tomorrow']:
-            for j in ['live']:
+            for j in ['live', 'today', 'tomorrow']:
                 detail_list = [False] if i.api == 'vd' else [False]
                 for detail in detail_list:
                     t = threading.Thread(target=self.process_function, args=(i, j, detail))
