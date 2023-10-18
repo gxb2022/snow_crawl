@@ -38,7 +38,11 @@ class VbBasketballSpider(VbMinix):
                 sp_data_list = []
                 for i, j in data.items():
                     one_sp_data = OneSpData()
-                    one_sp_data.sp = j
+                    if 'sf' in model_field:
+                        j = 0 if float(j) <= 0 else float(j) - 1
+                        one_sp_data.sp = j
+                    else:
+                        one_sp_data.sp = j
                     # one_sp_data.name = i # name 同id 一样
                     one_sp_data.id = i
                     sp_data_list.append(one_sp_data)

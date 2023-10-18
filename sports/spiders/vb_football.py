@@ -86,7 +86,7 @@ class VbFootballSpider(VbMinix):
                 sp_data_list = []
                 for i, j in data.items():
                     one_sp_data = OneSpData()
-                    one_sp_data.sp = j
+                    one_sp_data.sp = 0 if float(j) < 0 else j
                     # one_sp_data.name = i # name 同id 一样
                     one_sp_data.id = i
                     sp_data_list.append(one_sp_data)
@@ -102,7 +102,7 @@ class VbFootballSpider(VbMinix):
         if len(parts) == 2:
             home_handicap = float(parts[0])
             away_handicap = float(parts[1])
-            sign = 1 if home_handicap >= 0 else -1
+            sign = -1 if "-" in str(odd) else 1
             absolute_value = abs(home_handicap)
             numeric_value = (away_handicap - absolute_value) / 2 + absolute_value
             return numeric_value * sign
@@ -112,15 +112,7 @@ class VbFootballSpider(VbMinix):
     def gen_item_score_data(self, one_bs_data, **kwargs) -> ScoreData():
         obj = self.score_data_obj()
         map_odd1 = {
-            '': 'whole', '1st': 'half1', '2nd': 'half2',
-            'q1': 'th1',
-            'q1_paused': 'th1',
-            'q2': 'th2',
-            'q2_paused': 'th2',
-            'q3': 'th3',
-            'q3_paused': 'th3',
-            'q4': 'th4',
-            'q4_paused': 'th4',
+            '': 'whole', '1h': 'half1'
         }
         detail = one_bs_data.get("detail", {})
         if not detail:
@@ -129,16 +121,13 @@ class VbFootballSpider(VbMinix):
         model_period = map_odd1.get(period)
         if not model_period:
             print(f'无法提取model_period，period:{period}')
+        print(f'detail:{detail}')
         obj.period = model_period
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time
         obj.whole = str(detail.get("score")).split('-')
-        obj.half1 = str(detail["1h"]).split('-')
-        obj.half2 = str(detail["2h"]).split('-')
-        obj.th1 = str(detail["q1"]).split('-')
-        obj.th2 = str(detail["q2"]).split('-')
-        obj.th3 = str(detail["q3"]).split('-')
-        obj.th4 = str(detail["q4"]).split('-')
+        obj.half1 = str(detail["ht-score"]).split('-')
+        # obj.half2 = str(detail["2h"]).split('-')
         return obj
 
 

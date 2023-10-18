@@ -22,7 +22,7 @@ class Ball:
     @classmethod
     def get_ball_list(cls):
         """返回排序后的列表"""
-        return ["football", "basketball", "table_tennis"]
+        return ["football", "basketball"]
 
 
 class BallTime:
