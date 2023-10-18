@@ -36,7 +36,7 @@ class BtiFootballSpider(BtiMinix):
         # whole
         map_score_time = {23: 'half1', 24: 'half2', 25: '中场'}
 
-        score_data_obj.remain_timestamp = one_bs_data[7][2]
+        score_data_obj.score_timestamp = one_bs_data[7][2]
         score_data_obj.period = map_score_time.get(one_bs_data[7][3])
         if one_bs_data[7][3] == 24:
             score_data_obj.period = 'whole'
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(BtiFootballSpider, ball_time='tomorrow')
+    process.crawl(BtiFootballSpider, ball_time='live', detail_requests=True)
 
     # 启动爬虫
     process.start()

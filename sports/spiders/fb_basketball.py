@@ -15,28 +15,32 @@ class FbBasketballSpider(FbMinix):
         bs_id = one_bs_data.get('id')
         score_data_obj = self.score_data_obj()
         nsg_data_list = one_bs_data.get('nsg', [])
-        map_pe, map_mty = self.get_map_pe_mty()
-
+        map_pe = {
+            'whole': 3001,
+            'half1': 3003,
+            'half2': 3004,
+            'th1': 3005,
+            'th2': 3007,
+            'th3': 3009,
+            'th4': 3011
+        }
         new_map_pe = {v: k for k, v in map_pe.items()}
         mc_data_dict = one_bs_data.get("mc", {})
         if nsg_data_list:
             pe = mc_data_dict.get("pe")
-            # 第三节 第四节 显示特殊
-            if pe == 3009:
-                pe = 3007
-            if pe == 3011:
-                pe = 3008
             mc_pe = new_map_pe.get(pe)  # 比赛节数
+            # 3006 第一节结束
+            if pe == 3006:
+                mc_pe = 3005
+            if pe == 3008:
+                mc_pe = 3007
             if pe == 3010:
-                mc_pe = f'单节结束{mc_pe}'
-            if pe == 3012:
-                mc_pe = f'加时赛{mc_pe}'
+                mc_pe = 3009
             if not mc_pe:
-                print(f'bs_id:{bs_id},1检查数据是否正确pe:{pe}:nsg_data_list{nsg_data_list},mc_data_dict{mc_data_dict}')
-            # 3009 3010 3011 是可能是结束 也有很大可能是其他原因
+                self.sports_logger.error(f'bs_id:{bs_id},无法提取比分pe:{pe}:{nsg_data_list},{mc_data_dict}')
 
-            score_data_obj.remain_timestamp_str = ""
-            score_data_obj.remain_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
+            score_data_obj.score_time = ""
+            score_data_obj.score_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
             score_data_obj.period = mc_pe
         for nsg_data in nsg_data_list:
             pe = nsg_data['pe']
@@ -78,7 +82,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(FbBasketballSpider, ball_time='today', detail_requests=True)
+    process.crawl(FbBasketballSpider, ball_time='live', detail_requests=True)
 
     # 启动爬虫
     process.start()

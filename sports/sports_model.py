@@ -198,15 +198,46 @@ class FootballOddData(OddData):
 
 class ScoreData:
     period = "当前时期"
-    remain_timestamp = "剩下时间戳"
-    remain_timestamp_str = "当前时期剩余时间"
+    score_timestamp = "剩下时间戳"
+    score_time = "当前时期剩余时间"
+
+    @classmethod
+    def seconds_to_time(cls, seconds):
+        minutes = seconds // 60
+        seconds = seconds % 60
+        return f'{minutes:02d}:{seconds:02d}'
+
+    @classmethod
+    def time_string_to_seconds(cls, time_str):
+        try:
+            minutes, seconds = map(int, time_str.split(":"))
+            total_seconds = minutes * 60 + seconds
+            return total_seconds
+        except ValueError:
+            return time_str
 
     def __setattr__(self, name, value):
         super().__setattr__(name, value)
 
     def clean_data(self) -> dict:
         """清洗数据并校验数据为标准格式"""
-        return self.__dict__
+        # 只保留值为真的
+        result_data = {k: v for k, v in self.__dict__.items() if v or v == 0}
+        if 'score_time' not in result_data and 'score_timestamp' in result_data:
+            score_timestamp = result_data.get("score_timestamp")
+            result_data["score_time"] = self.seconds_to_time(score_timestamp)
+        if 'score_timestamp' not in result_data and 'score_time' in result_data:
+            score_time = result_data.get("score_time")
+            result_data["score_timestamp"] = self.time_string_to_seconds(score_time)
+        new_result_data = {}
+        for i, j in result_data.items():
+            if isinstance(j, list):
+                v = [int(_) for _ in j if str(_).isdigit()]
+            else:
+                v = j
+            if v or v == 0:
+                new_result_data[i] = v
+        return new_result_data
 
 
 class BasketballScoreData(ScoreData):

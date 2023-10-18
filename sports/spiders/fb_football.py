@@ -41,35 +41,25 @@ class FbFootballSpider(FbMinix):
         return map_pe, map_mty
 
     def gen_item_score_data(self, one_bs_data, **kwargs):
-        bs_id = one_bs_data.get('id')
         score_data_obj = self.score_data_obj()
         nsg_data_list = one_bs_data.get('nsg', [])
-        map_pe, map_mty = self.get_map_pe_mty()
-
-        new_map_pe = {v: k for k, v in map_pe.items()}
+        if not nsg_data_list:
+            return score_data_obj
+        bs_id = one_bs_data.get('id')
         mc_data_dict = one_bs_data.get("mc", {})
-
-        if nsg_data_list:
-            pe = mc_data_dict.get("pe")
-            if pe == 1004:  # 足球
-                pe = 1001
-            mc_pe = new_map_pe.get(pe)  # 比赛节数
-            if pe == 1005:
-                mc_pe = f'常规时间结束{mc_pe}'
-            if pe == 1010:
-                mc_pe = f'点球大战{mc_pe}'
-            if not mc_pe:
-                print(f'bs_id:{bs_id},1检查数据是否正确pe:{pe}:nsg_data_list{nsg_data_list},mc_data_dict{mc_data_dict}')
-            # 3009 3010 3011 是可能是结束 也有很大可能是其他原因
-            score_data_obj.remain_timestamp_str = ""
-            score_data_obj.remain_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
-            score_data_obj.period = mc_pe
+        pe = mc_data_dict.get("pe")
+        mc_pe = {1004: 'whole', 1002: 'half1'}.get(pe)  # 比赛节数
+        if not mc_pe:
+            self.sports_logger.error(f'bs_id:{bs_id},1检查数据是否正确pe:{pe}:{nsg_data_list},{mc_data_dict}')
+        score_data_obj.score_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
+        score_data_obj.period = mc_pe
+        _score_map = {1001: 'whole', 1002: 'half1', 1003: 'half2'}
         for nsg_data in nsg_data_list:
             pe = nsg_data['pe']
             sc = nsg_data['sc']
             tyg = nsg_data['tyg']
-            if pe in new_map_pe and tyg == 5:
-                setattr(score_data_obj, new_map_pe[pe], sc)
+            if pe in _score_map and tyg == 5:
+                setattr(score_data_obj, _score_map[pe], sc)
         return score_data_obj
 
 
@@ -81,7 +71,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(FbFootballSpider, ball_time='live')
+    process.crawl(FbFootballSpider, ball_time='live', detail_requests=True)
 
     # 启动爬虫
     process.start()

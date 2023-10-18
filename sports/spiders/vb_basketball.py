@@ -49,29 +49,28 @@ class VbBasketballSpider(VbMinix):
         return obj
 
     def gen_item_score_data(self, one_bs_data, **kwargs) -> ScoreData():
-        def time_string_to_seconds(time_str):
-            try:
-                minutes, seconds = map(int, time_str.split(":"))
-                total_seconds = minutes * 60 + seconds
-                return total_seconds
-            except ValueError:
-                return time_str
-        map_odd1 = {
-            'whole': "",
-            'half1': "1st",
-            'half2': "2nd",
-            'th1': "q1",
-            'th2': "q2",
-            'th3': "q3",
-            'th4': "q4"
-        }
-        map_odd1 = {j: i for i, j in map_odd1.items()}
-        detail = one_bs_data.get("detail", {})
         obj = self.score_data_obj()
-        obj.period = map_odd1.get(detail["period"])
-        remain_timestamp_str = detail.get("time")
-        obj.remain_timestamp_str = remain_timestamp_str
-        obj.remain_timestamp = time_string_to_seconds(remain_timestamp_str)
+        map_odd1 = {
+            '': 'whole', '1st': 'half1', '2nd': 'half2',
+            'q1': 'th1',
+            'q1_paused': 'th1',
+            'q2': 'th2',
+            'q2_paused': 'th2',
+            'q3': 'th3',
+            'q3_paused': 'th3',
+            'q4': 'th4',
+            'q4_paused': 'th4',
+        }
+        detail = one_bs_data.get("detail", {})
+        if not detail:
+            return obj
+        period = detail["period"]
+        model_period = map_odd1.get(period)
+        if not model_period:
+            print(f'无法提取model_period，period:{period}')
+        obj.period = model_period
+        score_time = detail.get("time")
+        obj.score_time = "00:00" if not score_time else score_time
         obj.whole = str(detail.get("score")).split('-')
         obj.half1 = str(detail["1h"]).split('-')
         obj.half2 = str(detail["2h"]).split('-')
