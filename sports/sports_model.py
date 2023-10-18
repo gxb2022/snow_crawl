@@ -251,6 +251,7 @@ class BasketballScoreData(ScoreData):
 
 
 class FootballScoreData(ScoreData):
+    # map_period = {1002: 'half1', 1003: "half1_end", 1004: "half2"}
     score_time = '比分时间'
     whole = '全场'
     half1 = '上全场'

@@ -111,23 +111,20 @@ class VbFootballSpider(VbMinix):
 
     def gen_item_score_data(self, one_bs_data, **kwargs) -> ScoreData():
         obj = self.score_data_obj()
-        map_odd1 = {
-            '': 'whole', '1h': 'half1'
-        }
+        map_period = {'1h': 'half1', "2h": "half2", "ht": "half1_end"}
         detail = one_bs_data.get("detail", {})
         if not detail:
             return obj
         period = detail["period"]
-        model_period = map_odd1.get(period)
+        model_period = map_period.get(period)
         if not model_period:
             print(f'无法提取model_period，period:{period}')
-        print(f'detail:{detail}')
         obj.period = model_period
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time
         obj.whole = str(detail.get("score")).split('-')
         obj.half1 = str(detail["ht-score"]).split('-')
-        # obj.half2 = str(detail["2h"]).split('-')
+        obj.half2 = str(detail["2nd-ht-score"]).split('-')
         return obj
 
 

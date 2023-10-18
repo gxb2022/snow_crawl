@@ -15,39 +15,43 @@ class FbBasketballSpider(FbMinix):
         bs_id = one_bs_data.get('id')
         score_data_obj = self.score_data_obj()
         nsg_data_list = one_bs_data.get('nsg', [])
-        map_pe = {
-            'whole': 3001,
-            'half1': 3003,
-            'half2': 3004,
-            'th1': 3005,
-            'th2': 3007,
-            'th3': 3009,
-            'th4': 3011
+        map_period = {
+            3005: 'th1',
+            3006: 'th1',  # th1_end
+            3007: 'th2',
+            3008: 'th2',  # th2_end
+            3009: 'th3',
+            3010: 'th2',  # th3_end
+            3011: 'th4'
         }
-        new_map_pe = {v: k for k, v in map_pe.items()}
         mc_data_dict = one_bs_data.get("mc", {})
         if nsg_data_list:
             pe = mc_data_dict.get("pe")
-            mc_pe = new_map_pe.get(pe)  # 比赛节数
-            # 3006 第一节结束
-            if pe == 3006:
-                mc_pe = 3005
-            if pe == 3008:
-                mc_pe = 3007
-            if pe == 3010:
-                mc_pe = 3009
+            mc_pe = map_period.get(pe)  # 比赛节数
             if not mc_pe:
                 self.sports_logger.error(f'bs_id:{bs_id},无法提取比分pe:{pe}:{nsg_data_list},{mc_data_dict}')
-
             score_data_obj.score_time = ""
             score_data_obj.score_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
             score_data_obj.period = mc_pe
+
+        map_score = {
+            3001: 'whole',
+            3003: 'half1',
+            3004: 'half2',
+            3005: 'th1',
+            3006: 'th1',  # th1_end
+            3007: 'th2',
+            3008: 'th2',  # th2_end
+            3009: 'th3',
+            3010: 'th2',  # th3_end
+            3011: 'th4',
+        }
         for nsg_data in nsg_data_list:
             pe = nsg_data['pe']
             sc = nsg_data['sc']
             tyg = nsg_data['tyg']
-            if pe in new_map_pe and tyg == 5:
-                setattr(score_data_obj, new_map_pe[pe], sc)
+            if pe in map_score and tyg == 5:
+                setattr(score_data_obj, map_score[pe], sc)
         return score_data_obj
 
     @classmethod

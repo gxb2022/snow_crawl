@@ -29,17 +29,16 @@ class BtiFootballSpider(BtiMinix):
         return map_odd
 
     def gen_item_score_data(self, one_bs_data, **kwargs):
+        map_period = {23: 'half1', 24: 'half2', 25: 'half1_end'}
         score_data_obj = self.score_data_obj()
         raw_score_data: dict = one_bs_data[4][3]
         if not raw_score_data:
             return score_data_obj
-        # whole
-        map_score_time = {23: 'half1', 24: 'half2', 25: '中场'}
-
+        period = map_period.get(one_bs_data[7][3])
+        if not period:
+            print(f'无法提取model_period，period:{period}')
         score_data_obj.score_timestamp = one_bs_data[7][2]
-        score_data_obj.period = map_score_time.get(one_bs_data[7][3])
-        if one_bs_data[7][3] == 24:
-            score_data_obj.period = 'whole'
+        score_data_obj.period = period
         score_data_obj.whole = [int(one_bs_data[4][0]), int(one_bs_data[4][1])]
         map_score = {
             'half1': 'firstHalfScore',
@@ -60,7 +59,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(BtiFootballSpider, ball_time='live', detail_requests=True)
+    process.crawl(BtiFootballSpider, ball_time='live', detail_requests=False)
 
     # 启动爬虫
     process.start()

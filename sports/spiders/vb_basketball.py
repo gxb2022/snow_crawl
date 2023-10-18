@@ -55,7 +55,6 @@ class VbBasketballSpider(VbMinix):
     def gen_item_score_data(self, one_bs_data, **kwargs) -> ScoreData():
         obj = self.score_data_obj()
         map_odd1 = {
-            '': 'whole', '1st': 'half1', '2nd': 'half2',
             'q1': 'th1',
             'q1_paused': 'th1',
             'q2': 'th2',

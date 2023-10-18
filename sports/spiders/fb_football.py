@@ -41,6 +41,7 @@ class FbFootballSpider(FbMinix):
         return map_pe, map_mty
 
     def gen_item_score_data(self, one_bs_data, **kwargs):
+        map_period = {1002: 'half1', 1003: "half1_end", 1004: "half2"}
         score_data_obj = self.score_data_obj()
         nsg_data_list = one_bs_data.get('nsg', [])
         if not nsg_data_list:
@@ -48,11 +49,11 @@ class FbFootballSpider(FbMinix):
         bs_id = one_bs_data.get('id')
         mc_data_dict = one_bs_data.get("mc", {})
         pe = mc_data_dict.get("pe")
-        mc_pe = {1004: 'whole', 1002: 'half1'}.get(pe)  # 比赛节数
-        if not mc_pe:
+        period = map_period.get(pe)  # 比赛节数
+        if not period:
             self.sports_logger.error(f'bs_id:{bs_id},1检查数据是否正确pe:{pe}:{nsg_data_list},{mc_data_dict}')
         score_data_obj.score_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
-        score_data_obj.period = mc_pe
+        score_data_obj.period = period
         _score_map = {1001: 'whole', 1002: 'half1', 1003: 'half2'}
         for nsg_data in nsg_data_list:
             pe = nsg_data['pe']
@@ -71,7 +72,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(FbFootballSpider, ball_time='live', detail_requests=True)
+    process.crawl(FbFootballSpider, ball_time='live', detail_requests=False)
 
     # 启动爬虫
     process.start()
