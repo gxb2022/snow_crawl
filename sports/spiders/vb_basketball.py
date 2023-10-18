@@ -28,7 +28,7 @@ class VbBasketballSpider(VbMinix):
                 self.logger.error(f'无法识别字段:{field}')
                 continue
             model_field = self.map_odd_field[field]
-            self.logger.debug(f'success识别字段:{field},对应模型字段:{model_field}')
+            self.sports_logger.debug(f'success识别字段:{field},对应模型字段:{model_field}')
             data_list = [field_data] if isinstance(field_data, dict) else field_data
             sp_info_list = []
             for data in data_list:

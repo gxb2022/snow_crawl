@@ -59,7 +59,6 @@ class VbFootballSpider(VbMinix):
             "ou#cr": "whole_jq_ou",
             "ah#cr": "whole_jq_hp",
         }
-        print(map_odd)
         map_odd.update(map_odd_ex)
         return map_odd
 
@@ -74,9 +73,9 @@ class VbFootballSpider(VbMinix):
                 continue
             model_field = self.map_odd_field.get(field)
             if field not in self.map_odd_field:
-                self.sports_logger.error(f'无法识别字段:{field}')
+                self.sports_logger.debug(f'无法识别字段:{field}')
                 continue
-            print(f'success识别字段:{field},对应模型字段:{model_field}')
+            self.sports_logger.debug(f'success识别字段:{field},对应模型字段:{model_field}')
             data_list = [field_data] if isinstance(field_data, dict) else field_data
             sp_info_list = []
             for data in data_list:
