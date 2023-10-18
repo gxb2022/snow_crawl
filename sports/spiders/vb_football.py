@@ -144,7 +144,6 @@ class VbFootballSpider(VbMinix):
 
 
 if __name__ == '__main__':
-    VbFootballSpider.get_map_odd_field()
     from scrapy.crawler import CrawlerProcess
     from scrapy.utils.project import get_project_settings
 
