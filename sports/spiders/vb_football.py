@@ -118,7 +118,7 @@ class VbFootballSpider(VbMinix):
         period = detail["period"]
         model_period = map_period.get(period)
         if not model_period:
-            print(f'无法提取model_period，period:{period}')
+            self.sports_logger.error(f'无法提取score,raw_period:{period},{detail}')
         obj.period = model_period
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time
