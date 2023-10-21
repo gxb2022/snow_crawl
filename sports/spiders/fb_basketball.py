@@ -39,12 +39,9 @@ class FbBasketballSpider(FbMinix):
             3003: 'half1',
             3004: 'half2',
             3005: 'th1',
-            3006: 'th1',  # th1_end
-            3007: 'th2',
-            3008: 'th2',  # th2_end
-            3009: 'th3',
-            3010: 'th2',  # th3_end
-            3011: 'th4',
+            3006: 'th2',  # th1_end
+            3007: 'th3',
+            3008: 'th4',  # th2_end
         }
         for nsg_data in nsg_data_list:
             pe = nsg_data['pe']
