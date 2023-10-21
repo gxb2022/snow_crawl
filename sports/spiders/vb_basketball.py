@@ -125,6 +125,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbBasketballSpider, ball_time='live')
+    process.crawl(VbBasketballSpider, ball_time='today')
     # 启动爬虫
     process.start()
