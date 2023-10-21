@@ -46,7 +46,6 @@ class SportsDownloaderMiddleware:
                 return request
         if spider.api == 'fb' and response.status == 403:
             print(f'请求错误:::::{response.text}')
-
         return response
 
     def get_bti_cookie(self, spider):

@@ -31,10 +31,12 @@ class VbMinix(AbcSpider):
         in_play_str = "true" if self.ball_time == 'live' else "false"
         url1 = f'{self.host}/product/business/sport/tournament/info?' \
                f'sid={sid}&inplay={in_play_str}&sort=kickOffTime&language=zh-cn&date={date_str}'
+
         iid_list = [] if iid_list is None else iid_list
         iid_list_str = ",".join(iid_list)
         url2 = f"{self.host}/product/business/sport/match/simple?sid={sid}&iidList={iid_list_str}&inplay={in_play_str}"
         url = url1 if url_style == 'request_league' else url2
+        print(url_style, url)
         return url
 
     @classmethod
@@ -68,6 +70,7 @@ class VbMinix(AbcSpider):
             matches = matches_list["matches"]
             for _ in matches:
                 iid_list.append(str(_["iid"]))
+        print(iid_list)
         if iid_list:
             url = self.get_url(url_style='request_bs', iid_list=iid_list)
             yield scrapy.Request(url=url, headers=self.get_headers(), callback=self.parse)
