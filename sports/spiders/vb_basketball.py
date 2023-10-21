@@ -75,12 +75,12 @@ class VbBasketballSpider(VbMinix):
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time
         obj.whole = str(detail.get("score")).split('-')
-        obj.half1 = str(detail["1h"]).split('-')
-        obj.half2 = str(detail["2h"]).split('-')
-        obj.th1 = str(detail["q1"]).split('-')
-        obj.th2 = str(detail["q2"]).split('-')
-        obj.th3 = str(detail["q3"]).split('-')
-        obj.th4 = str(detail["q4"]).split('-')
+        obj.half1 = str(detail.get("1h", "")).split('-')
+        obj.half2 = str(detail.get("2h", "")).split('-')
+        obj.th1 = str(detail.get("q1", "")).split('-')
+        obj.th2 = str(detail.get("q2", "")).split('-')
+        obj.th3 = str(detail.get("q3", "")).split('-')
+        obj.th4 = str(detail.get("q4", "")).split('-')
         return obj
 
     @classmethod
