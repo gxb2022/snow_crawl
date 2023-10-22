@@ -83,8 +83,8 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         return score_data_obj
 
     def test_save_json_data(self, raw_data, bs_id="ALL"):
-        # if bs_id:
-        #     return
+        if bs_id:
+            return
         file_name = f'{spider_path}/test_data/{self.api}_{self.ball}_{self.ball_time}_{bs_id}.json'
         with open(file_name, 'w', encoding='utf-8') as f:
             f.write(json.dumps(raw_data, ensure_ascii=False))

@@ -1,5 +1,7 @@
 # -- coding: utf-8 --
-from datetime import date, timedelta
+from datetime import timedelta, datetime
+
+import pytz
 
 from sports.spiders.abc_spider import *
 
@@ -24,14 +26,23 @@ class VbMinix(AbcSpider):
     def get_url(self, url_style='request_league', iid_list=None):
         map_sid = {"football": 1, "basketball": 2}
         sid = map_sid.get(self.ball)
-        current_date = date.today()
+        # 获取当前日期时间
+        current_datetime = datetime.now()
+        # 获取时间戳
+        timestamp = current_datetime.timestamp()
+        # 设置目标时区为GMT-04:00
+        target_timezone = pytz.timezone('US/Eastern')
+        # 使用目标时区转换时间戳为日期时间对象
+        current_datetime_with_timezone = datetime.fromtimestamp(timestamp, tz=target_timezone)
+        # 获取日期对象
+        current_date = current_datetime_with_timezone.date()
+        # 格式化日期为字符串
         today_string = current_date.strftime("%Y%m%d")
         tomorrow_string = (current_date + timedelta(days=1)).strftime("%Y%m%d")
         date_str = tomorrow_string if self.ball_time == 'tomorrow' else today_string
         in_play_str = "true" if self.ball_time == 'live' else "false"
         url1 = f'{self.host}/product/business/sport/tournament/info?' \
                f'sid={sid}&inplay={in_play_str}&sort=kickOffTime&language=zh-cn&date={date_str}'
-
         iid_list = [] if iid_list is None else iid_list
         iid_list_str = ",".join(iid_list)
         url2 = f"{self.host}/product/business/sport/match/simple?sid={sid}&iidList={iid_list_str}&inplay={in_play_str}"

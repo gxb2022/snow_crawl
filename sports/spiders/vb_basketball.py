@@ -18,37 +18,40 @@ class VbBasketballSpider(VbMinix):
     def gen_item_odd_data(self, one_bs_data, **kwargs) -> OddData():
         obj = self.odd_data_obj()
         # lp_ 最后得分 adh_ 胜负平
-        skip_field = ["lp_", "adh", "oe_2h", "tmcp"]
+        skip_field = ["lp_", "adh", "oe_2h", "tmcp", "ot", "ttslast"]
         market = one_bs_data["market"]
         for field, field_data in market.items():
             if [i for i in skip_field if i in field]:
                 self.logger.debug(f'放弃提取的字段：{field}')
                 continue
             if field not in self.map_odd_field:
-                self.logger.error(f'无法识别字段:{field}')
+                self.logger.error(f'无法识别字段:{field},field_data:{field_data}')
                 continue
             model_field = self.map_odd_field[field]
-            self.sports_logger.debug(f'success识别字段:{field},对应模型字段:{model_field}')
+            self.sports_logger.debug(f'success识别字段:{field},对应模型字段:{model_field},{field_data}')
             data_list = [field_data] if isinstance(field_data, dict) else field_data
             sp_info_list = []
             for data in data_list:
                 sp_info = SpInfo()
                 odd = data.pop("k", None)
                 sp_info.odd = odd
+                sp_info.id = field
                 sp_data_list = []
                 for i, j in data.items():
+                    if float(j) <= 0:
+                        continue
                     one_sp_data = OneSpData()
                     if 'sf' in model_field:
-                        j = 0 if float(j) <= 0 else float(j) - 1
+                        j = float(j) - 1
                         one_sp_data.sp = j
                     else:
                         one_sp_data.sp = j
                     # one_sp_data.name = i # name 同id 一样
                     one_sp_data.id = i
                     sp_data_list.append(one_sp_data)
-                sp_info.data = sp_data_list
-                sp_info.id = field
-                sp_info_list.append(sp_info)
+                if sp_data_list:
+                    sp_info.data = sp_data_list
+                    sp_info_list.append(sp_info)
             setattr(obj, model_field, sp_info_list)
         return obj
 
@@ -125,6 +128,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbBasketballSpider, ball_time='today')
+    process.crawl(VbBasketballSpider, ball_time='tomorrow')
     # 启动爬虫
     process.start()
