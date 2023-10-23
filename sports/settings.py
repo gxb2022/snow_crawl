@@ -112,5 +112,4 @@ CONCURRENT_REQUESTS_PER_IP = 100  # 单个ip最大并发数
 DOWNLOAD_DELAY = 0  # 下载延时，高并发采集时设为0
 DOWNLOAD_TIMEOUT = 8  # 超时时间设置，一般设置在10-30之间
 # 禁用URL长度检查
-URLLENGTH_LIMIT = 9999  # 设置一个足够大的值，以确保不会因URL长度而被忽略
-
+URLLENGTH_LIMIT = 9999  # 设置一个足够大的值，以确保不会因URL长度而被忽略 vb
