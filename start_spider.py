@@ -48,7 +48,7 @@ class RunSpider:
         threads = []
         for i in self.spider_class_list:
             for j in ['live', 'today', 'tomorrow']:
-                detail_list = [False] if i.api == 'vd' else [False]
+                detail_list = [False] if i.api == 'vd' else [False, True]
                 for detail in detail_list:
                     t = threading.Thread(target=self.process_function, args=(i, j, detail))
                     threads.append(t)
