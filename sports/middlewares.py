@@ -20,7 +20,7 @@ class RedisControlMiddleware:
         ball_time = spider.ball_time
         result = self.redis_client.exists(f'spiders_control:{api}&{ball}&{ball_time}')
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
-        if result == 1:
+        if result == 0:
             print(f'spiders_control:{api}&{ball}&{ball_time},忽略爬虫,request{request.meta}')
             raise IgnoreRequest
         return None
