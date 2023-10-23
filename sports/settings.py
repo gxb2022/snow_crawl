@@ -63,6 +63,7 @@ TELNETCONSOLE_ENABLED = False
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'sports.middlewares.SportsDownloaderMiddleware': 543,
+    'sports.middlewares.RedisControlMiddleware': 10,
 }
 
 # Enable or disable extensions

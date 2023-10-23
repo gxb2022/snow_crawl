@@ -35,11 +35,6 @@ class RunSpider:
 
     def process_function(self, spider_class, ball_time, detail_requests):
         while True:
-            key_exists = self.redis_client.exists("allow_spider")
-            if not key_exists:
-                time.sleep(1)
-                continue
-            # 创建两个新的子进程来同时运行爬虫
             p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
             p1.start()
             p1.join()

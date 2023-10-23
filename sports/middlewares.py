@@ -3,7 +3,37 @@ import json
 import random
 import time
 
+import redis
 import requests
+from scrapy.exceptions import IgnoreRequest
+from scrapy.utils.project import get_project_settings
+
+
+class RedisControlMiddleware:
+    hash_name = 'spiders_control'
+
+    def __init__(self):
+        settings = get_project_settings()
+        redis_config = settings.get("REDIS_CONFIG", {})
+        self.redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
+
+    def check_redis_key_value(self, api, ball, ball_time):
+        # 使用 hget 方法获取指定哈希表中指定字段的值
+        value = self.redis_client.get(f'spiders_control:{api}&{ball}&{ball_time}')
+        if value:
+            return True
+        return False
+
+    def process_request(self, request, spider):
+        api = spider.api
+        ball = spider.ball
+        ball_time = spider.ball_time
+        result = self.check_redis_key_value(api, ball, ball_time)
+        # 在 spider_opened 方法中可以执行爬虫启动时的操作
+        if result is False:
+            print(f'spiders_control:{api}&{ball}&{ball_time},忽略爬虫,request{request.meta}')
+            raise IgnoreRequest
+        return None
 
 
 class SportsDownloaderMiddleware:
@@ -29,8 +59,8 @@ class SportsDownloaderMiddleware:
         request.headers.setdefault('User-Agent', user_agent)
         if spider.detail_requests is True:
             port = random.choice([10002, 10003, 10033, 10034, 10040])
-            proxy = f'http://issac-country-KR-refreshMinutes-3:' \
-                    f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
+            proxy = "http:" + f'//issac-country-KR-refreshMinutes-3:' \
+                              f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
             request.meta['proxy'] = proxy
         self.request_time = time.time()
         return None
@@ -63,9 +93,3 @@ class SportsDownloaderMiddleware:
             cookie = {}
             spider.sports_logger.warning(f'Fail update local cookie')
         return cookie
-
-    def process_exception(self, request, exception, spider):
-        # 处理请求异常，例如连接超时或代理错误
-        # 在日志中记录代理IP地址和异常信息
-        proxy_ip = request.meta.get('proxy')
-        spider.sports_logger.error(f"Proxy IP {proxy_ip} encountered an exception: {exception}")
