@@ -10,27 +10,17 @@ from scrapy.utils.project import get_project_settings
 
 
 class RedisControlMiddleware:
-    hash_name = 'spiders_control'
-
-    def __init__(self):
-        settings = get_project_settings()
-        redis_config = settings.get("REDIS_CONFIG", {})
-        self.redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
-
-    def check_redis_key_value(self, api, ball, ball_time):
-        # 使用 hget 方法获取指定哈希表中指定字段的值
-        value = self.redis_client.get(f'spiders_control:{api}&{ball}&{ball_time}')
-        if value:
-            return True
-        return False
+    settings = get_project_settings()
+    redis_config = settings.get("REDIS_CONFIG", {})
+    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     def process_request(self, request, spider):
         api = spider.api
         ball = spider.ball
         ball_time = spider.ball_time
-        result = self.check_redis_key_value(api, ball, ball_time)
+        result = self.redis_client.exists(f'spiders_control:{api}&{ball}&{ball_time}')
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
-        if result is False:
+        if result == 1:
             print(f'spiders_control:{api}&{ball}&{ball_time},忽略爬虫,request{request.meta}')
             raise IgnoreRequest
         return None

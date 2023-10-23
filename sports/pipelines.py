@@ -7,12 +7,12 @@ from scrapy.utils.project import get_project_settings
 
 
 class SportsPipeline:
+    settings = get_project_settings()
+    redis_config = settings.get("REDIS_CONFIG", {})
+    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     def __init__(self):
         self.start_timestamp = 0
-        settings = get_project_settings()
-        redis_config = settings.get("REDIS_CONFIG", {})
-        self.redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
         self.pipe = self.redis_client.pipeline()
         self.live_set = set()
         self.today_set = set()
