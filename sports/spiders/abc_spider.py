@@ -24,7 +24,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
     odd_data_obj = OddData
     score_data_obj = ScoreData
 
-    def __init__(self, ball_time, detail_requests=False, **kwargs):
+    def __init__(self, ball_time, detail_requests=0, **kwargs):
         super().__init__(**kwargs)
         self.ball_time = ball_time
         self.detail_requests = detail_requests
@@ -48,7 +48,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         item['score_data'] = self.gen_item_score_data(one_bs_data, **kwargs)
         yield item
         # 赛选需要获取详细数据的bs_id
-        if self.detail_requests is True:
+        if self.detail_requests:
             yield from self.yield_detail_requests(one_bs_data, copy.deepcopy(item))
 
     @abc.abstractmethod
