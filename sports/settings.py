@@ -8,7 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 REDIS_CONFIG = {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "port": 6379,
     "db": 12,
     "password": ""

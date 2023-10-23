@@ -90,13 +90,16 @@ class SportsPipeline:
         }
         name = f'detail_spiders_state' if spider.detail_requests is True else f'spiders_state'
         self.pipe.hset(name=name, key=f'{self.api}&{self.ball}&{self.ball_time}', value=json.dumps(run_state))
-        spider.sports_logger.warning(f'detail_requests:{spider.detail_requests},爬虫关闭,总数量:[{bs_data_num}]')
         # 执行管道中的命令
         self.pipe.execute()
 
     def close_spider(self, spider):
         self.save_data()
         self.save_run_state(spider)
+        bs_data_num = len(self.bs_data_dict)
+        spider.sports_logger.warning(
+            f'爬虫关闭,detail:{spider.detail_requests},总数量:[{bs_data_num}],耗时：{time.time() - self.start_timestamp}'
+        )
 
 
 if __name__ == '__main__':
