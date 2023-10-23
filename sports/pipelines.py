@@ -41,7 +41,7 @@ class SportsPipeline:
         return item
 
     def save_data_to_pipe(self, bs_id, bs_data, odd_data, score_data):
-        now_timestamp = time.time()
+        now_timestamp = int(time.time())
         self.pipe.hset(f'{self.ball}:{self.api}:{self.ball_time}:bs_data', key=bs_id, value=json.dumps(bs_data))
         self.pipe.hset(f'{self.ball}:{self.api}:{self.ball_time}:score_data', key=bs_id, value=json.dumps(score_data))
         self.pipe.hset(f'{self.ball}:{self.api}:{self.ball_time}:odd_data', key=bs_id, value=json.dumps(odd_data))
