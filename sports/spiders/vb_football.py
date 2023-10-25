@@ -84,11 +84,16 @@ class VbFootballSpider(VbMinix):
                 data.pop("absK", None)
                 sp_info.odd = self.change_odd(odd)
                 sp_data_list = []
+                # 'bs_gs': '双方均有进球'
                 for i, j in data.items():
                     if float(j) <= 0:
                         continue
                     one_sp_data = OneSpData()
-                    one_sp_data.sp = j
+                    if 'bs_gs' in model_field:
+                        j = float(j) - 1
+                        one_sp_data.sp = j
+                    else:
+                        one_sp_data.sp = j
                     # one_sp_data.name = i # name 同id 一样
                     one_sp_data.id = i
                     sp_data_list.append(one_sp_data)
