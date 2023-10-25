@@ -17,15 +17,15 @@ class VbBasketballSpider(VbMinix):
 
     def gen_item_odd_data(self, one_bs_data, **kwargs) -> OddData():
         obj = self.odd_data_obj()
-        # lp_ 最后得分 adh_ 胜负平
-        skip_field = ["lp_", "adh", "oe_2h", "tmcp", "ot", "ttslast"]
+        # lp_ 最后得分 adh_ 胜负平 rpts 首先得到 {'k': '40', 'a': '1.89', 'h': '1.95'}
+        # skip_field = ["lp_", "adh", "oe_2h", "tmcp", "ot", "ttslast", "rpts"]
         market = one_bs_data["market"]
         for field, field_data in market.items():
-            if [i for i in skip_field if i in field]:
-                self.logger.debug(f'放弃提取的字段：{field}')
-                continue
+            # if [i for i in skip_field if i in field]:
+            #     self.logger.debug(f'放弃提取的字段：{field}')
+            #     continue
             if field not in self.map_odd_field:
-                self.logger.error(f'无法识别字段:{field},field_data:{field_data}')
+                self.logger.info(f'无法识别字段:{field},field_data:{field_data}')
                 continue
             model_field = self.map_odd_field[field]
             self.sports_logger.debug(f'success识别字段:{field},对应模型字段:{model_field},{field_data}')
@@ -128,6 +128,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbBasketballSpider, ball_time='today')
+    process.crawl(VbBasketballSpider, ball_time='tomorrow')
     # 启动爬虫
     process.start()

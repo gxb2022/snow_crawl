@@ -87,7 +87,7 @@ class BtiMinix(AbcSpider):
             url = f'https://demo-light.bti.bet/api/eventpage/events/{bs_id}'
             yield scrapy.Request(
                 url=url, headers=self.get_headers(), callback=self.parse_detail,
-                meta={"bs_id": bs_id, "item": item},
+                meta={"bs_id": bs_id, "item": item, "detail_requests": True},
                 errback=self.handle_error
             )
 
@@ -99,6 +99,7 @@ class BtiMinix(AbcSpider):
         data = raw_data.get("data")
         one_bs_data = data[0] if data else []
         if one_bs_data:
+            item["is_detail_data"] = True
             item['odd_data'] = self.gen_detail_item_odd_data(one_bs_data)
             yield item
 

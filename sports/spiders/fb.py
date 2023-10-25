@@ -86,13 +86,15 @@ class FbMinix(AbcSpider):
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
 
     def parse_detail(self, response):
-        raw_data = response.json()
+        item = response.meta.get("item")
         bs_id = response.meta.get("bs_id")
+        raw_data = response.json()
         self.test_save_json_data(raw_data, bs_id=bs_id)
         one_bs_data = raw_data.get("data", {})
         if one_bs_data:
-            item = self.item_obj()
-            yield from self.handle_one_bs_data(item, one_bs_data, detail_requests=False)
+            item["is_detail_data"] = True
+            item['odd_data'] = self.gen_item_odd_data(one_bs_data)
+            yield item
 
     def yield_detail_requests(self, one_bs_data, item):
         tms = one_bs_data.get('tms', 0)
@@ -122,7 +124,7 @@ class FbMinix(AbcSpider):
                 method='POST',
                 headers=self.get_headers(),
                 callback=self.parse_detail,
-                meta={"bs_id": bs_id, "item": item}
+                meta={"bs_id": bs_id, "item": item, "detail_requests": True}
             )
 
     def gen_item_bs_data(self, one_bs_data, **kwargs):
@@ -144,11 +146,11 @@ class FbMinix(AbcSpider):
         for odd_raw_data in odd_raw_data_list:
             raw_odd_name = odd_raw_data.get('nm')  # 网页原始盘口字段名
             # skip_str_list 不提取的数据
-            skip_str_list1 = ['末位数', '赛节单双组合', '比赛会有加时-常规时间', '& 大小']
-            skip_str_list2 = ['让球胜平负', '双重机会', '零失球', '&', '精确进球数', '分钟', '半场/全场', '获胜退款']
-            skip_str_list = skip_str_list2 if self.ball == 'football' else skip_str_list1
-            if any(s in str(raw_odd_name) for s in skip_str_list):
-                continue
+            # skip_str_list1 = ['末位数', '赛节单双组合', '比赛会有加时-常规时间', '& 大小']
+            # skip_str_list2 = ['让球胜平负', '双重机会', '零失球', '&', '精确进球数', '分钟', '半场/全场', '获胜退款']
+            # skip_str_list = skip_str_list2 if self.ball == 'football' else skip_str_list1
+            # if any(s in str(raw_odd_name) for s in skip_str_list):
+            #     continue
             pe = odd_raw_data.get('pe')
             mty = odd_raw_data.get('mty')
             # 在map中查找 pe mty

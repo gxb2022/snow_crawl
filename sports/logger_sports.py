@@ -13,7 +13,7 @@ class LoggerSports:
     def __init__(self, ball, api, ball_time, level='DEBUG'):
 
         log_name = f'{ball}_{api}_{ball_time}'
-        formatter_str = f'%(asctime)s [{ball}_{api}_{ball_time}] %(levelname)s: %(message)s'
+        formatter_str = f'%(asctime)s [{ball:10} {api:5} {ball_time:10}] %(levelname)s: %(message)s'
 
         if log_name in loggers:
             # 如果已存在相应名称的日志记录器，则直接使用现有的日志记录器

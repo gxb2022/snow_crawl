@@ -65,12 +65,12 @@ class VbFootballSpider(VbMinix):
     def gen_item_odd_data(self, one_bs_data, **kwargs) -> OddData():
         obj = self.odd_data_obj()
         # lp_ 最后得分 adh_ 胜负平
-        skip_field = ["t", "&", "wb", "oe#cr"]
+        # skip_field = ["t", "&", "wb", "oe#cr"]
         market = one_bs_data["market"]
         for field, field_data in market.items():
-            if [i for i in skip_field if i in field]:
-                self.sports_logger.debug(f'放弃提取的字段：{field}')
-                continue
+            # if [i for i in skip_field if i in field]:
+            #     self.sports_logger.debug(f'放弃提取的字段：{field}')
+            #     continue
             model_field = self.map_odd_field.get(field)
             if field not in self.map_odd_field:
                 self.sports_logger.debug(f'无法识别字段:{field}')
