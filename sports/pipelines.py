@@ -68,12 +68,16 @@ class SportsPipeline:
             "expend_time": expend_time,
             "tz": str(tz)
         }
-        name = f'detail_spiders_state' if spider.detail_requests is True else f'spiders_state'
-        self.pipe.hset(name=name, key=f'{self.ball}:{self.api}:{self.ball_time}', value=json.dumps(run_state))
+        if spider.detail_requests:
+            key = f"detail&{self.ball}&{self.api}&{self.ball_time}"
+            _ = f'【🟢🟢🟢详细爬虫】,🟢详细数量:{len(self.detail_bs_id_set)}'
+        else:
+            key = f"{self.ball}&{self.api}&{self.ball_time}"
+            _ = f'【普通爬虫】'
+        self.pipe.hset(name=f'spiders_run_info', key=key, value=json.dumps(run_state))
         # 批量执行管道中的命令
         self.pipe.execute()
         pipe_expend_time = time.time() - now_timestamp
-        _ = f'【🟢🟢🟢详细爬虫】,详细数量:{len(self.detail_bs_id_set)}' if spider.detail_requests else '【普通爬虫】'
         spider.sports_logger.warning(f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time},管道耗时{pipe_expend_time}')
 
     def close_spider(self, spider):
