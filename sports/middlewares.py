@@ -49,7 +49,6 @@ class SportsDownloaderMiddleware:
         detail_requests = request.meta.get("detail_requests")
         if detail_requests:
             port = random.choice([10002, 10003, 10033, 10034, 10040])
-            print(f'使用代理{port}')
             proxy = "http:" + f'//issac-country-KR-refreshMinutes-3:' \
                               f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
             request.meta['proxy'] = proxy

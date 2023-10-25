@@ -25,15 +25,18 @@ class RunSpider:
     @classmethod
     # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
+        ball_time_delay = {"live": 1, "today": 10, "tomorrow": 20}
+        delay = ball_time_delay[ball_time]
+        # 增加一个错开延时
+        if detail_requests:
+            time.sleep(delay/2)
+        _delay = 1 if detail_requests else 0
+        time.sleep(_delay)
         settings = get_project_settings()
         process = CrawlerProcess(settings=settings)
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
         process.start()
-        # process.stop()
-        ball_time_delay = {"live": 1, "today": 10, "tomorrow": 30}
-        # 增加一个错开延时
-        _delay = 1 if detail_requests else 0
-        time.sleep(ball_time_delay.get(ball_time, 1) + _delay)
+        time.sleep(delay)
 
     def process_function(self, spider_class, ball_time, detail_requests):
         while True:

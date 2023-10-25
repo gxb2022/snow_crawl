@@ -117,6 +117,7 @@ class BsData:
         result_filed_list = self.__result_filed_list()
         result_data = {field: self.__dict__.get(field) for field in result_filed_list}
         if not all(result_data.values()):
+            print(f'result_data:{result_data}')
             raise ValueError(f'result_data的值必须全部为真,result_data:{result_data}')
         return result_data
 
