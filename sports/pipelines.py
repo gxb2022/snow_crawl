@@ -46,8 +46,8 @@ class SportsPipeline:
         self.pipe.hset(f'{self.ball}:{self.api}:bs_data', key=bs_id, value=json.dumps(bs_data))
         self.pipe.hset(f'{self.ball}:{self.api}:score_data', key=bs_id, value=json.dumps(score_data))
         self.pipe.hset(f'{self.ball}:{self.api}:odd_data', key=bs_id, value=json.dumps(odd_data))
-        self.pipe.zadd(f'{self.ball}:{self.api}:bs_id_timestamp', mapping={bs_id: now_timestamp})
-        self.pipe.zadd(f'{self.ball}:{self.api}:{self.ball_time}:bs_id_timestamp', mapping={bs_id: now_timestamp})
+        self.pipe.zadd(f'{self.ball}:{self.api}:bs_id_data', mapping={bs_id: now_timestamp})
+        self.pipe.zadd(f'{self.ball}:{self.api}:{self.ball_time}:bs_id_data', mapping={bs_id: now_timestamp})
 
     def save_run_state(self, spider):
         """保存运行状态用于检查"""
