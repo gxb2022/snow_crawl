@@ -70,7 +70,6 @@ class BtiBasketballSpider(BtiMinix):
         score_data_obj.whole = [t1[0]+t2[0]+t3[0]+t4[0], t1[1]+t2[1]+t3[1]+t4[1]]
         score_data_obj.half1 = [t1[0]+t2[0], t1[1]+t2[1]]
         score_data_obj.half2 = [t3[0]+t4[0], t3[1]+t4[1]]
-        print(score_data_obj.__dict__)
         return score_data_obj
 
 
