@@ -51,10 +51,9 @@ class BtiBasketballSpider(BtiMinix):
         map_score_time = {14: 'th1', 16: 'th2', 18: 'th3', 20: 'th4'}
         score_data_obj.score_timestamp = one_bs_data[7][2]
         score_data_obj.period = map_score_time.get(one_bs_data[7][3])
-        score_data_obj.whole = [int(one_bs_data[4][0]), int(one_bs_data[4][1])]
         map_score = {
-            'half1': 'basketballFirstHalfScore',
-            'half2': 'basketballSecondHalfScore',
+            # 'half1': 'basketballFirstHalfScore',
+            # 'half2': 'basketballSecondHalfScore',
             'th1': 'basketballFirstQuarterScore',
             'th2': 'basketballSecondQuarterScore',
             'th3': 'basketballThirdQuarterScore',
@@ -64,6 +63,14 @@ class BtiBasketballSpider(BtiMinix):
             sc_ht = raw_score_data.get(f'{model_field_data}1')
             sc_gt = raw_score_data.get(f'{model_field_data}2')
             setattr(score_data_obj, model_field, [int(sc_ht), int(sc_gt)])
+        t1 = score_data_obj.th1
+        t2 = score_data_obj.th2
+        t3 = score_data_obj.th3
+        t4 = score_data_obj.th4
+        score_data_obj.whole = [t1[0]+t2[0]+t3[0]+t4[0], t1[1]+t2[1]+t3[1]+t4[1]]
+        score_data_obj.half1 = [t1[0]+t2[0], t1[1]+t2[1]]
+        score_data_obj.half2 = [t3[0]+t4[0], t3[1]+t4[1]]
+        print(score_data_obj.__dict__)
         return score_data_obj
 
 
@@ -75,7 +82,7 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(BtiBasketballSpider, ball_time='live', detail_requests=True)
+    process.crawl(BtiBasketballSpider, ball_time='live', detail_requests=False)
 
     # 启动爬虫
     process.start()
