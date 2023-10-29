@@ -17,11 +17,11 @@ class FbBasketballSpider(FbMinix):
         nsg_data_list = one_bs_data.get('nsg', [])
         map_period = {
             3005: 'th1',
-            3006: 'th1',  # th1_end
+            3006: 'th2',  # th2_start
             3007: 'th2',
-            3008: 'th2',  # th2_end
+            3008: 'th3',  # th3_start
             3009: 'th3',
-            3010: 'th2',  # th3_end
+            3010: 'th4',  # th4_start
             3011: 'th4'
         }
         mc_data_dict = one_bs_data.get("mc", {})

@@ -47,8 +47,8 @@ class RunSpider:
     def run(self):
         threads = []
         for i in self.spider_class_list:
-            for j in ['live', 'today', 'tomorrow']:
-                detail_list = [False] if i.api == 'vd' else [False, True]
+            for j in ['live']:
+                detail_list = [False]
                 for detail in detail_list:
                     t = threading.Thread(target=self.process_function, args=(i, j, detail))
                     threads.append(t)
@@ -60,7 +60,9 @@ class RunSpider:
 
 if __name__ == "__main__":
     _ = [
-        BtiFootballSpider, FbFootballSpider, VbFootballSpider,
-        BtiBasketballSpider, FbBasketballSpider, VbBasketballSpider
+        # BtiFootballSpider,
+        # FbFootballSpider, VbFootballSpider,
+        # BtiBasketballSpider,
+        FbBasketballSpider, VbBasketballSpider
     ]
     RunSpider(_).run()
