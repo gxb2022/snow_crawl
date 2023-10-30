@@ -73,6 +73,7 @@ class FbMinix(AbcSpider):
         self.test_save_json_data(raw_data, bs_id=bs_id)
         one_bs_data = raw_data.get("data", {})
         if one_bs_data:
+            item['is_detail_data'] = True
             item['odd_data'] = self.gen_item_odd_data(one_bs_data)
             item['score_data'] = self.gen_item_score_data(one_bs_data)
             yield item

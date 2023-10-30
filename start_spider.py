@@ -17,6 +17,9 @@ from sports.spiders.vb_basketball import VbBasketballSpider
 
 
 class RunSpider:
+    ball_time_list = ["live", "today", "tomorrow"]
+    ball_list = ["basketball", "footabll"]
+
     def __init__(self, spider_class_list):
         self.spider_class_list = spider_class_list
         redis_config = get_project_settings().get("REDIS_CONFIG", {})
@@ -25,11 +28,11 @@ class RunSpider:
     @classmethod
     # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
-        ball_time_delay = {"live": 1, "today": 10, "tomorrow": 20}
+        ball_time_delay = {"live": 0.2, "today": 10, "tomorrow": 20}
         delay = ball_time_delay[ball_time]
         # 增加一个错开延时
         if detail_requests:
-            time.sleep(delay/2)
+            time.sleep(delay / 2)
         _delay = 1 if detail_requests else 0
         time.sleep(_delay)
         settings = get_project_settings()
@@ -47,10 +50,10 @@ class RunSpider:
     def run(self):
         threads = []
         for i in self.spider_class_list:
-            for j in ['live']:
+            for ball_time in self.ball_time_list:
                 detail_list = [False]
                 for detail in detail_list:
-                    t = threading.Thread(target=self.process_function, args=(i, j, detail))
+                    t = threading.Thread(target=self.process_function, args=(i, ball_time, detail))
                     threads.append(t)
         for i in threads:
             i.start()
@@ -62,7 +65,6 @@ if __name__ == "__main__":
     _ = [
         # BtiFootballSpider,
         # FbFootballSpider, VbFootballSpider,
-        BtiBasketballSpider,
-        FbBasketballSpider, VbBasketballSpider
+        BtiBasketballSpider, FbBasketballSpider, VbBasketballSpider
     ]
     RunSpider(_).run()
