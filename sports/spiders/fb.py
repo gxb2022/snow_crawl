@@ -74,6 +74,7 @@ class FbMinix(AbcSpider):
         yield from self.yield_one_requests()
 
     def parse_detail(self, response):
+
         item = response.meta.get("item")
         bs_id = response.meta.get("bs_id")
         raw_data = response.json()
@@ -83,6 +84,7 @@ class FbMinix(AbcSpider):
             item['odd_data'] = self.gen_item_odd_data(one_bs_data)
             item['score_data'] = self.gen_item_score_data(one_bs_data)
             yield item
+            self.sports_logger.warning(f'解析详细请求：{bs_id}')
 
     def yield_detail_requests(self, one_bs_data, item):
         if self.ball_time == 'tomorrow':
@@ -90,10 +92,10 @@ class FbMinix(AbcSpider):
         tms = one_bs_data.get('tms', 0)
         hot = one_bs_data.get('lg', {}).get("hot")
         send_detail_requests = False
-        if self.ball_time == 'live' and hot and tms > 18:
+        max_tms = 50 if self.ball == 'football' else 35
+        if self.ball_time == 'live' and hot and tms > max_tms - 15:
             send_detail_requests = True
-        max_tms = 50 if self.ball == 'football' else 30
-        if tms > max_tms:
+        if tms >= max_tms:
             send_detail_requests = True
         if send_detail_requests:
             bs_id = one_bs_data.get('id')

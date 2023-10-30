@@ -32,7 +32,6 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         super().__init__(**kwargs)
         self.ball_time = ball_time
         self.detail_requests = detail_requests
-        self.detail_requests_num = 0
         self.check_parameters()
         # 日志记录
         self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='WARNING')

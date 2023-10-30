@@ -54,7 +54,7 @@ class SportsDownloaderMiddleware:
         user_agent = random.choice(self.user_agent_list)
         request.headers.setdefault('User-Agent', user_agent)
         if spider.detail_requests:
-            port = random.choice(range(10002, 10099))
+            port = random.choice([10002, 10003, 10033, 10034, 10040])
             proxy = "http:" + f'//issac-country-KR-refreshMinutes-3:' \
                               f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
             request.meta['proxy'] = proxy
@@ -62,10 +62,6 @@ class SportsDownloaderMiddleware:
         return None
 
     def process_response(self, request, response, spider):
-        if response.status == 200:
-            proxy_ip = request.meta.get('proxy')
-            self.redis_client.incr(f'{spider.api}:{proxy_ip}')  # 递增计数器
-
         # bti 需要session才能请求通过 400响应码是正常的
         if spider.api == 'bti' and response.status in [422, 401, 403]:
             cookie = self.get_bti_cookie(spider)

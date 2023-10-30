@@ -85,14 +85,12 @@ class BtiMinix(AbcSpider):
             if all_odd_num < 50:
                 return
 
-        if self.detail_requests_num < 100:
-            self.detail_requests_num += 1
-            url = f'https://demo-light.bti.bet/api/eventpage/events/{bs_id}'
-            yield scrapy.Request(
-                url=url, headers=self.get_headers(), callback=self.parse_detail,
-                meta={"bs_id": bs_id, "item": item, "detail_requests": True},
-                errback=self.handle_error
-            )
+        url = f'https://demo-light.bti.bet/api/eventpage/events/{bs_id}'
+        yield scrapy.Request(
+            url=url, headers=self.get_headers(), callback=self.parse_detail,
+            meta={"bs_id": bs_id, "item": item, "detail_requests": True},
+            errback=self.handle_error
+        )
 
     def parse_detail(self, response):
         item = response.meta.get("item")
@@ -105,6 +103,7 @@ class BtiMinix(AbcSpider):
             item["is_detail_data"] = True
             item['odd_data'] = self.gen_detail_item_odd_data(one_bs_data)
             yield item
+            self.sports_logger.warning(f'解析详细请求：{bs_id}')
 
     def gen_item_bs_data(self, one_bs_data, **kwargs):
         bs_data_obj = BsData()
