@@ -115,3 +115,6 @@ REACTOR_THREADPOOL_MAXSIZE = 4
 
 # 禁用URL长度检查
 URLLENGTH_LIMIT = 9999  # 设置一个足够大的值，以确保不会因URL长度而被忽略 vb
+
+# 禁止去重
+DUPEFILTER_CLASS = 'scrapy.dupefilters.BaseDupeFilter'

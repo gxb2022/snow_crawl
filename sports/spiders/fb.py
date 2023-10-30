@@ -11,34 +11,16 @@ class FbMinix(AbcSpider):
     host_list = ['https://test.f66b88sport.com/']
     official_website = "https://test.f66b88sport.com/"
 
-    def start_requests(self):
-        yield from self.yield_one_requests()
-
     def yield_one_requests(self, page=1):
         url = f'https://{self.host}/v1/match/getList'
         headers = self.get_headers()
         body = self.get_body(page)
         meta = {"page": page}
-        self.sports_logger.info(f'Start one requests,page:{page},url:{url},body:{body}')
         yield scrapy.Request(
-            url=url, body=json.dumps(body), method='POST', headers=headers, callback=self.parse, meta=meta
+            url=url, body=json.dumps(body), method='POST', headers=headers, callback=self.parse, meta=meta,
+            dont_filter=True
         )
 
-    def handle_bs_detail_requests(self, ball_time, bs_id):
-        url = f"https://{self.host}/v1/match/getMatchDetail"
-        body = {
-            "languageType": "CMN",
-            "matchId": bs_id
-        }
-        yield scrapy.Request(
-            url=url,
-            body=json.dumps(body),
-            method='POST',
-            headers=self.get_headers(),
-            callback=self.parse_detail,
-            meta={"bs_id": bs_id, "ball_time": ball_time},
-            errback=self.handle_error
-        )
 
     @classmethod
     def get_headers(cls):
@@ -85,6 +67,10 @@ class FbMinix(AbcSpider):
             item = self.item_obj()
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
 
+        self.sports_logger.info(f'delay:{self.delay},Start next requests...')
+        time.sleep(self.delay)
+        yield from self.yield_one_requests()
+
     def parse_detail(self, response):
         item = response.meta.get("item")
         bs_id = response.meta.get("bs_id")
@@ -92,26 +78,21 @@ class FbMinix(AbcSpider):
         self.test_save_json_data(raw_data, bs_id=bs_id)
         one_bs_data = raw_data.get("data", {})
         if one_bs_data:
-            item["is_detail_data"] = True
             item['odd_data'] = self.gen_item_odd_data(one_bs_data)
+            item['score_data'] = self.gen_item_score_data(one_bs_data)
             yield item
 
     def yield_detail_requests(self, one_bs_data, item):
-        tms = one_bs_data.get('tms', 0)
-        # hot = one_bs_data.get('lg', {}).get("hot")
         if self.ball_time == 'tomorrow':
             return
-        need_requests_bs_detail = False
-        if self.ball == 'basketball':
-            if tms > 35:
-                need_requests_bs_detail = True
-        if self.ball == 'football':
-            if tms > 50:
-                need_requests_bs_detail = True
-
-        if need_requests_bs_detail and self.detail_requests_num < 100:
-            self.detail_requests_num += 1
-
+        tms = one_bs_data.get('tms', 0)
+        hot = one_bs_data.get('lg', {}).get("hot")
+        send_detail_requests = False
+        if self.ball_time == 'live' and hot and tms > 10:
+            send_detail_requests = True
+        if tms > 30:
+            send_detail_requests = True
+        if send_detail_requests:
             bs_id = one_bs_data.get('id')
             url = f"https://{self.host}/v1/match/getMatchDetail"
             body = {
@@ -126,6 +107,7 @@ class FbMinix(AbcSpider):
                 callback=self.parse_detail,
                 meta={"bs_id": bs_id, "item": item, "detail_requests": True}
             )
+            print(f'发送详细请求')
 
     def gen_item_bs_data(self, one_bs_data, **kwargs):
         bs_data_obj = BsData()
@@ -165,7 +147,7 @@ class FbMinix(AbcSpider):
                     mty_model_field = field
                     break
             if not all([pe_model_field, mty_model_field]):
-                self.sports_logger.info(f'无法解析数据，{raw_odd_name},{pe_model_field, mty_model_field},{odd_raw_data}')
+                self.sports_logger.debug(f'无法解析数据，{raw_odd_name},{pe_model_field, mty_model_field},{odd_raw_data}')
                 continue
             sp_info_list = []  # 一个种类盘口多条数据
             mks_data_list = odd_raw_data.get('mks')

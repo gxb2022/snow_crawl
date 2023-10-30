@@ -62,7 +62,7 @@ if __name__ == "__main__":
     _ = [
         # BtiFootballSpider,
         # FbFootballSpider, VbFootballSpider,
-        # BtiBasketballSpider,
+        BtiBasketballSpider,
         FbBasketballSpider, VbBasketballSpider
     ]
     RunSpider(_).run()

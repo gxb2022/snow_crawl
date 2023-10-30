@@ -21,7 +21,10 @@ class RedisControlMiddleware:
         result = self.redis_client.exists(f'spiders_control:{ball}:{api}:{ball_time}')
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
         if result == 0:
-            raise IgnoreRequest
+            time.sleep(1)
+            print(f'忽略请求...')
+            return request
+            # raise IgnoreRequest
         return None
 
 
@@ -46,12 +49,12 @@ class SportsDownloaderMiddleware:
     def process_request(self, request, spider):
         user_agent = random.choice(self.user_agent_list)
         request.headers.setdefault('User-Agent', user_agent)
-        detail_requests = request.meta.get("detail_requests")
-        if detail_requests:
+        if spider.detail_requests:
             port = random.choice([10002, 10003, 10033, 10034, 10040])
             proxy = "http:" + f'//issac-country-KR-refreshMinutes-3:' \
                               f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
             request.meta['proxy'] = proxy
+            print(1111)
         self.request_time = time.time()
         return None
 

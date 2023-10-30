@@ -1,4 +1,5 @@
 # -- coding: utf-8 --
+
 from datetime import timedelta, datetime
 
 import pytz
@@ -15,13 +16,24 @@ class VbMinix(AbcSpider):
 
     def __init__(self, ball_time, **kwargs):
         super().__init__(ball_time, **kwargs)
-        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='DEBUG')
+        self.iid_set = set()
 
-    def start_requests(self):
+
+    def request_iid(self):
+        """每10秒获取一次iid"""
+        self.iid_set.clear()
         url = self.get_url(url_style='request_league')
         headers = self.get_headers()
         self.sports_logger.info(f'Start one requests,url_style:url_style,url:{url}')
         yield scrapy.Request(url=url, headers=headers, callback=self.parse_iid)
+
+    def request_bs(self):
+        url = self.get_url(url_style='request_bs', iid_list=list(self.iid_set))
+        yield scrapy.Request(url=url, headers=self.get_headers(), callback=self.parse)
+
+    def yield_one_requests(self, page=1):
+        yield from self.request_iid()
+
 
     def get_url(self, url_style='request_league', iid_list=None):
         map_sid = {"football": 1, "basketball": 2}
@@ -73,16 +85,14 @@ class VbMinix(AbcSpider):
         }
 
     def parse_iid(self, response):
+        self.iid_set.clear()
         raw_data = response.json()
         tournaments = raw_data.get("data", {}).get("tournaments", [])
-        iid_list = []
         for matches_list in tournaments:
             matches = matches_list["matches"]
             for _ in matches:
-                iid_list.append(str(_["iid"]))
-        if iid_list:
-            url = self.get_url(url_style='request_bs', iid_list=iid_list)
-            yield scrapy.Request(url=url, headers=self.get_headers(), callback=self.parse)
+                self.iid_set.add(str(_["iid"]))
+        yield from self.request_bs()
 
     def parse(self, response, **kwargs):
         """子类必须重写 第一次解析"""
@@ -92,6 +102,10 @@ class VbMinix(AbcSpider):
         for one_bs_data in bs_data_list:
             item = self.item_obj()
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
+
+        self.sports_logger.info(f'delay:{self.delay},Start next requests...')
+        time.sleep(self.delay)
+        yield from self.yield_one_requests()
 
     def gen_item_bs_data(self, one_bs_data, **kwargs) -> BsData():
         bs_data_obj = BsData()

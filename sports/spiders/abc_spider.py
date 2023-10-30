@@ -3,6 +3,7 @@ import abc
 import copy
 import json
 import os
+import time
 
 from sports.items import *
 from sports.sports_model import *
@@ -16,9 +17,12 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
     api = None
     ball = None
     host = ''
+
     support_api_list = Api.get_api_list()
     support_ball_list = Ball.get_ball_list()
     support_ball_time_list = BallTime.get_ball_time_list()
+
+    ball_time_delay = {"live": 0.2, "today": 10, "tomorrow": 20}
 
     item_obj = SportsItem
     odd_data_obj = OddData
@@ -31,8 +35,19 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         self.detail_requests_num = 0
         self.check_parameters()
         # 日志记录
-        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='WARNING')
+        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='INFO')
         self.is_detail_requests = False
+        self.delay = self.ball_time_delay[self.ball_time]
+
+    def start_requests(self):
+        yield from self.yield_one_requests()
+
+    @abc.abstractmethod
+    def yield_one_requests(self):
+        yield
+        delay = self.ball_time_delay[self.ball_time]
+        self.sports_logger.info(f'delay:{delay},Start one requests')
+        time.sleep(delay)
 
     def check_parameters(self):
         if self.api not in self.support_api_list:
