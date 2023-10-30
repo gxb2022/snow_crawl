@@ -17,10 +17,8 @@ class FbMinix(AbcSpider):
         body = self.get_body(page)
         meta = {"page": page}
         yield scrapy.Request(
-            url=url, body=json.dumps(body), method='POST', headers=headers, callback=self.parse, meta=meta,
-            dont_filter=True
+            url=url, body=json.dumps(body), method='POST', headers=headers, callback=self.parse, meta=meta
         )
-
 
     @classmethod
     def get_headers(cls):
@@ -146,7 +144,8 @@ class FbMinix(AbcSpider):
                     mty_model_field = field
                     break
             if not all([pe_model_field, mty_model_field]):
-                self.sports_logger.debug(f'无法解析数据，{raw_odd_name},{pe_model_field, mty_model_field},{odd_raw_data}')
+                self.sports_logger.debug(
+                    f'无法解析数据，{raw_odd_name},{pe_model_field, mty_model_field},{odd_raw_data}')
                 continue
             sp_info_list = []  # 一个种类盘口多条数据
             mks_data_list = odd_raw_data.get('mks')

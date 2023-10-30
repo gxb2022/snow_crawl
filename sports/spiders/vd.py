@@ -18,7 +18,6 @@ class VbMinix(AbcSpider):
         super().__init__(ball_time, **kwargs)
         self.iid_set = set()
 
-
     def request_iid(self):
         """每10秒获取一次iid"""
         self.iid_set.clear()
@@ -33,7 +32,6 @@ class VbMinix(AbcSpider):
 
     def yield_one_requests(self, page=1):
         yield from self.request_iid()
-
 
     def get_url(self, url_style='request_league', iid_list=None):
         map_sid = {"football": 1, "basketball": 2}
