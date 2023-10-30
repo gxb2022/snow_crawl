@@ -131,7 +131,7 @@ class VbFootballSpider(VbMinix):
         obj.period = model_period
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time
-        for i, j in zip(["whole", "half1", "half2"],["score", "ht-score", "2nd-ht-score"]):
+        for i, j in zip(["whole", "half1", "half2"], ["score", "ht-score", "2nd-ht-score"]):
             _ = str(detail.get(j, "")).split('-')
             if len(_) == 2:
                 setattr(obj, i, _)
