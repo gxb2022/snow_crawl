@@ -10,6 +10,11 @@ class BtiBasketballSpider(BtiMinix):
     odd_data_obj = BasketballOddData
     score_data_obj = BasketballScoreData
 
+    def __init__(self, ball_time, **kwargs):
+
+        super().__init__(ball_time, **kwargs)
+        self.closing = False
+
     @classmethod
     def get_map_odd_field(cls):
 
