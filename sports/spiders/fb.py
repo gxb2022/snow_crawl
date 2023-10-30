@@ -68,8 +68,11 @@ class FbMinix(AbcSpider):
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
 
         now_time = time.time()
-        self.sports_logger.warning(f'耗时:【{now_time - self.start_time}】,delay:{self.delay},Start next requests...')
-        self.start_time = now_time
+        expend_time = now_time - self.start_timestamp - self.delay
+        self.sports_logger.warning(
+            f'page:{page}:【{len(bs_data_list):5}】,耗时:【{expend_time:5f}】,延时{self.delay}秒后继续请求...'
+        )
+        self.start_timestamp = now_time
         time.sleep(self.delay)
         yield from self.yield_one_requests()
 

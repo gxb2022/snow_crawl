@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import abc
 import copy
+import datetime
 import json
 import os
 import time
@@ -38,7 +39,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         self.is_detail_requests = False
         self.delay = self.ball_time_delay[self.ball_time]
 
-        self.start_time = time.time()
+        self.start_timestamp = time.time()
 
     def start_requests(self):
         yield from self.yield_one_requests()
@@ -112,3 +113,13 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         exception = failure.value  # 获取异常信息
         proxy_ip = request.meta.get('proxy')
         print(f"detail_requests:{self.detail_requests},proxy_ip：{proxy_ip}Request:{request.url} failed : {exception}")
+
+    def save_run_state(self, spider):
+        """保存运行状态用于检查"""
+        now_timestamp = time.time()
+        expend_time = now_timestamp - self.start_timestamp
+        dt = datetime.datetime.fromtimestamp(now_timestamp)
+        tz = dt.astimezone().tzinfo
+        update_time = dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+        name = f'detail_spiders_state' if spider.detail_requests is True else f'spiders_state'
+        pass

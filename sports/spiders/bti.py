@@ -61,15 +61,18 @@ class BtiMinix(AbcSpider):
         raw_data = response.json()
         league_data_list = raw_data.get('serializedData', [])
         self.test_save_json_data(raw_data)
+        bs_num = 0
         for league_data in league_data_list:
             league = league_data[8]
             bs_data_list = league_data[12]
             for one_bs_data in bs_data_list:
                 item = self.item_obj()
                 yield from self.handle_one_bs_data(item, one_bs_data, league=league)
+                bs_num += 1
         now_time = time.time()
-        self.sports_logger.warning(f'耗时:【{now_time-self.start_time}】,delay:{self.delay},Start next requests...')
-        self.start_time = now_time
+        expend_time = now_time - self.start_timestamp - self.delay
+        self.sports_logger.warning(f'数量:【{bs_num:5}】,耗时:【{expend_time:5f}】,延时{self.delay}秒后继续请求...')
+        self.start_timestamp = now_time
         time.sleep(self.delay)
         yield from self.yield_one_requests()
 
