@@ -16,6 +16,7 @@ class BtiMinix(AbcSpider):
         self.map_odd_field = self.get_map_odd_field()
 
     def yield_one_requests(self):
+        self.sports_logger.info(f'发送请求间隔{self.delay}')
         url = self.get_url()
         headers = self.get_headers()
         yield scrapy.Request(url=url, headers=headers, callback=self.parse, errback=self.handle_error)
@@ -66,8 +67,9 @@ class BtiMinix(AbcSpider):
             for one_bs_data in bs_data_list:
                 item = self.item_obj()
                 yield from self.handle_one_bs_data(item, one_bs_data, league=league)
-
-        self.sports_logger.info(f'delay:{self.delay},Start next requests...')
+        now_time = time.time()
+        self.sports_logger.warning(f'耗时:【{now_time-self.start_time}】,delay:{self.delay},Start next requests...')
+        self.start_time = now_time
         time.sleep(self.delay)
         yield from self.yield_one_requests()
 

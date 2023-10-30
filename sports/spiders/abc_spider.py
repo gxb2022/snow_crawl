@@ -35,9 +35,11 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         self.detail_requests_num = 0
         self.check_parameters()
         # 日志记录
-        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='INFO')
+        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='WARNING')
         self.is_detail_requests = False
         self.delay = self.ball_time_delay[self.ball_time]
+
+        self.start_time = time.time()
 
     def start_requests(self):
         yield from self.yield_one_requests()
@@ -106,6 +108,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
 
     def handle_error(self, failure):
         # 处理请求错误
+        print(1111111111111111111111111111111111111111)
         request = failure.request  # 获取引发错误的请求对象
         exception = failure.value  # 获取异常信息
         proxy_ip = request.meta.get('proxy')

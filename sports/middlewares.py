@@ -5,7 +5,6 @@ import time
 
 import redis
 import requests
-from scrapy.exceptions import IgnoreRequest
 from scrapy.utils.project import get_project_settings
 
 
@@ -18,17 +17,22 @@ class RedisControlMiddleware:
         api = spider.api
         ball = spider.ball
         ball_time = spider.ball_time
-        result = self.redis_client.exists(f'spiders_control:{ball}:{api}:{ball_time}')
+        key = f'spiders_control:{ball}:{api}:{ball_time}'
+        result = self.redis_client.exists(key)
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
         if result == 0:
             time.sleep(1)
-            print(f'忽略请求...')
+            print(f'不存在key:{key},忽略请求...')
             return request
             # raise IgnoreRequest
         return None
 
 
 class SportsDownloaderMiddleware:
+    settings = get_project_settings()
+    redis_config = settings.get("REDIS_CONFIG", {})
+    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
+
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
@@ -50,7 +54,7 @@ class SportsDownloaderMiddleware:
         user_agent = random.choice(self.user_agent_list)
         request.headers.setdefault('User-Agent', user_agent)
         if spider.detail_requests:
-            port = random.choice([10002, 10003, 10033, 10034, 10040])
+            port = random.choice(range(10002, 10099))
             proxy = "http:" + f'//issac-country-KR-refreshMinutes-3:' \
                               f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
             request.meta['proxy'] = proxy
@@ -58,6 +62,10 @@ class SportsDownloaderMiddleware:
         return None
 
     def process_response(self, request, response, spider):
+        if response.status == 200:
+            proxy_ip = request.meta.get('proxy')
+            self.redis_client.incr(f'{spider.api}:{proxy_ip}')  # 递增计数器
+
         # bti 需要session才能请求通过 400响应码是正常的
         if spider.api == 'bti' and response.status in [422, 401, 403]:
             cookie = self.get_bti_cookie(spider)

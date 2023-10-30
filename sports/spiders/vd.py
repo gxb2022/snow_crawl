@@ -31,6 +31,7 @@ class VbMinix(AbcSpider):
         yield scrapy.Request(url=url, headers=self.get_headers(), callback=self.parse)
 
     def yield_one_requests(self, page=1):
+        self.sports_logger.info(f'发送请求间隔{self.delay}')
         yield from self.request_iid()
 
     def get_url(self, url_style='request_league', iid_list=None):
@@ -101,7 +102,9 @@ class VbMinix(AbcSpider):
             item = self.item_obj()
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
 
-        self.sports_logger.info(f'delay:{self.delay},Start next requests...')
+        now_time = time.time()
+        self.sports_logger.info(f'耗时:【{now_time - self.start_time}】,delay:{self.delay},Start next requests...')
+        self.start_time = now_time
         time.sleep(self.delay)
         yield from self.yield_one_requests()
 

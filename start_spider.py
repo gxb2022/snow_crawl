@@ -6,17 +6,20 @@ from sports.spiders.fb_basketball import FbBasketballSpider
 from sports.spiders.fb_football import FbFootballSpider
 from sports.spiders.vb_basketball import VbBasketballSpider
 from sports.spiders.vb_football import VbFootballSpider
+from sports.spiders.bti_basketball import BtiBasketballSpider
+from sports.spiders.bti_football import BtiFootballSpider
 
 
 class RunSpider:
     spider_class_list = [
-        FbFootballSpider, VbFootballSpider,
-        FbBasketballSpider, VbBasketballSpider
+        FbFootballSpider, VbFootballSpider, BtiFootballSpider,
+        FbBasketballSpider, VbBasketballSpider, BtiBasketballSpider
     ]
     ball_time_list = ['live', 'today', 'tomorrow']
-    detail_requests_list = [False, True]
+    detail_requests_list = [True]
 
-    def run_spider(self, spider_class, ball_time, detail_requests):
+    @classmethod
+    def run_spider(cls, spider_class, ball_time, detail_requests):
         _delay = 1 if detail_requests else 0
         time.sleep(_delay)
         settings = get_project_settings()
@@ -29,6 +32,8 @@ class RunSpider:
         for spider_class in self.spider_class_list:
             for ball_time in self.ball_time_list:
                 for detail_requests in self.detail_requests_list:
+                    if spider_class.api == 'vd' and detail_requests:
+                        continue
                     process = Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
                     processes.append(process)
                     process.start()

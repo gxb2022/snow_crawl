@@ -12,12 +12,14 @@ class FbMinix(AbcSpider):
     official_website = "https://test.f66b88sport.com/"
 
     def yield_one_requests(self, page=1):
+        self.sports_logger.info(f'发送请求间隔{self.delay}')
         url = f'https://{self.host}/v1/match/getList'
         headers = self.get_headers()
         body = self.get_body(page)
         meta = {"page": page}
         yield scrapy.Request(
-            url=url, body=json.dumps(body), method='POST', headers=headers, callback=self.parse, meta=meta
+            url=url, body=json.dumps(body), method='POST', headers=headers,
+            callback=self.parse, errback=self.handle_error, meta=meta
         )
 
     @classmethod
@@ -65,7 +67,9 @@ class FbMinix(AbcSpider):
             item = self.item_obj()
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
 
-        self.sports_logger.info(f'delay:{self.delay},Start next requests...')
+        now_time = time.time()
+        self.sports_logger.warning(f'耗时:【{now_time - self.start_time}】,delay:{self.delay},Start next requests...')
+        self.start_time = now_time
         time.sleep(self.delay)
         yield from self.yield_one_requests()
 
@@ -86,9 +90,10 @@ class FbMinix(AbcSpider):
         tms = one_bs_data.get('tms', 0)
         hot = one_bs_data.get('lg', {}).get("hot")
         send_detail_requests = False
-        if self.ball_time == 'live' and hot and tms > 10:
+        if self.ball_time == 'live' and hot and tms > 18:
             send_detail_requests = True
-        if tms > 30:
+        max_tms = 50 if self.ball == 'football' else 30
+        if tms > max_tms:
             send_detail_requests = True
         if send_detail_requests:
             bs_id = one_bs_data.get('id')

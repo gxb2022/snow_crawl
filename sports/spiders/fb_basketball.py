@@ -29,6 +29,7 @@ class FbBasketballSpider(FbMinix):
             pe = mc_data_dict.get("pe")
             mc_pe = map_period.get(pe)  # 比赛节数
             if not mc_pe:
+                mc_pe = pe
                 self.sports_logger.error(f'bs_id:{bs_id},无法提取比分pe:{pe}:{nsg_data_list},{mc_data_dict}')
             score_data_obj.score_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
             score_data_obj.period = mc_pe
