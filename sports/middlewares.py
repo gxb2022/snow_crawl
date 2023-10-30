@@ -29,10 +29,6 @@ class RedisControlMiddleware:
 
 
 class SportsDownloaderMiddleware:
-    settings = get_project_settings()
-    redis_config = settings.get("REDIS_CONFIG", {})
-    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
-
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
