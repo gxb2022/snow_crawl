@@ -1,47 +1,63 @@
+# -*- coding: utf-8 -*-
+import threading
+import multiprocessing
 import time
-from multiprocessing import Process
+
+import redis
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-from sports.spiders.fb_basketball import FbBasketballSpider
-from sports.spiders.fb_football import FbFootballSpider
-from sports.spiders.vb_basketball import VbBasketballSpider
-from sports.spiders.vb_football import VbFootballSpider
-from sports.spiders.bti_basketball import BtiBasketballSpider
+
 from sports.spiders.bti_football import BtiFootballSpider
+from sports.spiders.fb_football import FbFootballSpider
+from sports.spiders.vb_football import VbFootballSpider
+
+from sports.spiders.bti_basketball import BtiBasketballSpider
+from sports.spiders.fb_basketball import FbBasketballSpider
+from sports.spiders.vb_basketball import VbBasketballSpider
 
 
 class RunSpider:
-    spider_class_list = [
-        FbFootballSpider, VbFootballSpider, BtiFootballSpider,
-        FbBasketballSpider, VbBasketballSpider, BtiBasketballSpider
-    ]
-    ball_time_list = ['live', 'today', 'tomorrow']
-    detail_requests_list = [False, True]
+    def __init__(self, spider_class_list):
+        self.spider_class_list = spider_class_list
+        redis_config = get_project_settings().get("REDIS_CONFIG", {})
+        self.redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     @classmethod
+    # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
-        _delay = 1 if detail_requests else 0
-        time.sleep(_delay)
         settings = get_project_settings()
         process = CrawlerProcess(settings=settings)
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
         process.start()
+        process.stop()
+        ball_time_delay = {"live": 1, "today": 10, "tomorrow": 30}
+        # 增加一个错开延时
+        _delay = 1 if detail_requests else 0
+        time.sleep(ball_time_delay.get(ball_time, 1) + _delay)
+
+    def process_function(self, spider_class, ball_time, detail_requests):
+        while True:
+            p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
+            p1.start()
+            p1.join()
 
     def run(self):
-        processes = []
-        for spider_class in self.spider_class_list:
-            for ball_time in self.ball_time_list:
-                for detail_requests in self.detail_requests_list:
-                    if spider_class.api == 'vd' and detail_requests:
-                        continue
-                    process = Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
-                    processes.append(process)
-                    process.start()
-
-        for process in processes:
-            process.join()
+        threads = []
+        for i in self.spider_class_list:
+            for j in ['live', 'today', 'tomorrow']:
+                detail_list = [False] if i.api == 'vd' else [False, True]
+                for detail in detail_list:
+                    t = threading.Thread(target=self.process_function, args=(i, j, detail))
+                    threads.append(t)
+        for i in threads:
+            i.start()
+        for i in threads:
+            i.join()
 
 
 if __name__ == "__main__":
-    runner = RunSpider()
-    runner.run()
+    _ = [
+        BtiFootballSpider, FbFootballSpider, VbFootballSpider,
+        BtiBasketballSpider, FbBasketballSpider, VbBasketballSpider
+    ]
+    RunSpider(_).run()
