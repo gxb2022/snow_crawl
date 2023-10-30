@@ -112,4 +112,3 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         exception = failure.value  # 获取异常信息
         proxy_ip = request.meta.get('proxy')
         print(f"detail_requests:{self.detail_requests},proxy_ip：{proxy_ip}Request:{request.url} failed : {exception}")
-
