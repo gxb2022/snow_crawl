@@ -25,28 +25,30 @@ class RunSpider:
     @classmethod
     # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
+        ball_time_delay = {"live": 1, "today": 10, "tomorrow": 20}
+        delay = ball_time_delay[ball_time]
+        # 增加一个错开延时
+        if detail_requests:
+            time.sleep(delay/2)
+        _delay = 1 if detail_requests else 0
+        time.sleep(_delay)
         settings = get_project_settings()
         process = CrawlerProcess(settings=settings)
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
         process.start()
-        process.stop()
-        ball_time_delay = {"live": 0.2, "today": 10, "tomorrow": 20}
-        # 增加一个错开延时
-        _delay = 1 if detail_requests else 0
-        time.sleep(ball_time_delay.get(ball_time, 1) + _delay)
+        time.sleep(delay)
 
     def process_function(self, spider_class, ball_time, detail_requests):
         while True:
             p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
             p1.start()
             p1.join()
-            p1.close()
 
     def run(self):
         threads = []
         for i in self.spider_class_list:
-            for j in ['live', 'today', 'tomorrow']:
-                detail_list = [False] if i.api == 'vd' or j == 'tomorrow' else [False, True]
+            for j in ['live']:
+                detail_list = [False]
                 for detail in detail_list:
                     t = threading.Thread(target=self.process_function, args=(i, j, detail))
                     threads.append(t)
@@ -58,7 +60,9 @@ class RunSpider:
 
 if __name__ == "__main__":
     _ = [
-        BtiFootballSpider, FbFootballSpider, VbFootballSpider,
-        BtiBasketballSpider, FbBasketballSpider, VbBasketballSpider
+        # BtiFootballSpider,
+        # FbFootballSpider, VbFootballSpider,
+        BtiBasketballSpider,
+        FbBasketballSpider, VbBasketballSpider
     ]
     RunSpider(_).run()

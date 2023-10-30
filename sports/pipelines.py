@@ -31,12 +31,7 @@ class SportsPipeline:
         odd_data = item['odd_data']
         score_data = item['score_data']
         bs_id = bs_data['bs_id']
-        if detail_requests:
-            # 存在网络延时 实时保存
-            self.save_data_to_pipe(bs_id, bs_data, odd_data, score_data)
-            self.pipe.execute()
-        else:
-            self.save_data_to_pipe(bs_id, bs_data, odd_data, score_data)
+        self.save_data_to_pipe(bs_id, bs_data, odd_data, score_data)
         self.bs_id_set.add(bs_id)
         return item
 
@@ -45,7 +40,8 @@ class SportsPipeline:
         self.pipe.hset(f'{self.ball}:{self.api}:{self.ball_time}:bs_data', key=bs_id, value=json.dumps(bs_data))
         self.pipe.hset(f'{self.ball}:{self.api}:{self.ball_time}:score_data', key=bs_id, value=json.dumps(score_data))
         self.pipe.hset(f'{self.ball}:{self.api}:{self.ball_time}:odd_data', key=bs_id, value=json.dumps(odd_data))
-        self.pipe.zadd(f'{self.ball}:{self.api}:{self.ball_time}:bs_id_timestamp', mapping={bs_id: now_timestamp})
+        self.pipe.zadd(f'{self.ball}:{self.api}:{self.ball_time}:bs_id_data', mapping={bs_id: now_timestamp})
+        self.pipe.execute()
 
     def save_run_state(self, spider):
         """保存运行状态用于检查"""
