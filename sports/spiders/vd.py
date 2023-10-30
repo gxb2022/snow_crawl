@@ -103,7 +103,7 @@ class VbMinix(AbcSpider):
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
 
         now_time = time.time()
-        self.sports_logger.info(f'耗时:【{now_time - self.start_time}】,delay:{self.delay},Start next requests...')
+        self.sports_logger.warning(f'耗时:【{now_time - self.start_time}】,delay:{self.delay},Start next requests...')
         self.start_time = now_time
         time.sleep(self.delay)
         yield from self.yield_one_requests()
