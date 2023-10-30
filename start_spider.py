@@ -40,7 +40,7 @@ class RunSpider:
             p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
             p1.start()
             p1.join()
-            time.sleep(0.5)  # 添加1秒的延时
+            p1.close()
 
     def run(self):
         threads = []

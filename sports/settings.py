@@ -6,6 +6,8 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+COOKIES_ENABLED = False
+
 
 REDIS_CONFIG = {
     "host": "127.0.0.1",
@@ -14,12 +16,6 @@ REDIS_CONFIG = {
     "password": ""
 }
 
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = 6379
-REDIS_PARAMS = {
-    'password': '',
-    'db': 10
-}
 
 BOT_NAME = 'sports'
 
