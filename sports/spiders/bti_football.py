@@ -48,6 +48,7 @@ class BtiFootballSpider(BtiMinix):
             sc_ht = raw_score_data.get(f'{model_field_data}1', 0)
             sc_gt = raw_score_data.get(f'{model_field_data}2', 0)
             setattr(score_data_obj, model_field, [int(sc_ht), int(sc_gt)])
+        print(f'score_data_obj:{score_data_obj.__dict__}')
         return score_data_obj
 
 

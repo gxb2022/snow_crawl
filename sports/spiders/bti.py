@@ -15,9 +15,6 @@ class BtiMinix(AbcSpider):
         super().__init__(ball_time, **kwargs)
         self.map_odd_field = self.get_map_odd_field()
 
-    def start_requests(self):
-        yield from self.yield_one_requests()
-
     def yield_one_requests(self):
         url = self.get_url()
         headers = self.get_headers()
@@ -69,6 +66,10 @@ class BtiMinix(AbcSpider):
             for one_bs_data in bs_data_list:
                 item = self.item_obj()
                 yield from self.handle_one_bs_data(item, one_bs_data, league=league)
+
+        self.sports_logger.info(f'delay:{self.delay},Start next requests...')
+        time.sleep(self.delay)
+        yield from self.yield_one_requests()
 
     def yield_detail_requests(self, one_bs_data, item):
         bs_id = one_bs_data[0]

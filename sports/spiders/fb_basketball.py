@@ -30,7 +30,6 @@ class FbBasketballSpider(FbMinix):
             mc_pe = map_period.get(pe)  # 比赛节数
             if not mc_pe:
                 self.sports_logger.error(f'bs_id:{bs_id},无法提取比分pe:{pe}:{nsg_data_list},{mc_data_dict}')
-            score_data_obj.score_time = ""
             score_data_obj.score_timestamp = mc_data_dict.get("s")  # 比赛节数剩余时间
             score_data_obj.period = mc_pe
 
@@ -49,6 +48,7 @@ class FbBasketballSpider(FbMinix):
             tyg = nsg_data['tyg']
             if pe in map_score and tyg == 5:
                 setattr(score_data_obj, map_score[pe], sc)
+
         return score_data_obj
 
     @classmethod
@@ -83,6 +83,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(FbBasketballSpider, ball_time='today', detail_requests=True)
+    process.crawl(FbBasketballSpider, ball_time='live', detail_requests=True)
     # 启动爬虫
     process.start()

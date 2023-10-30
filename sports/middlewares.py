@@ -54,7 +54,6 @@ class SportsDownloaderMiddleware:
             proxy = "http:" + f'//issac-country-KR-refreshMinutes-3:' \
                               f'3df3c0-4bcaf3-c534b6-049793-4f5f41@private.residential.proxyrack.net:{port}'
             request.meta['proxy'] = proxy
-            print(1111)
         self.request_time = time.time()
         return None
 

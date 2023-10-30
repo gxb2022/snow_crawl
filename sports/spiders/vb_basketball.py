@@ -77,13 +77,12 @@ class VbBasketballSpider(VbMinix):
         obj.period = model_period
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time
-        obj.whole = str(detail.get("score")).split('-')
-        obj.half1 = str(detail.get("1h", "")).split('-')
-        obj.half2 = str(detail.get("2h", "")).split('-')
-        obj.th1 = str(detail.get("q1", "")).split('-')
-        obj.th2 = str(detail.get("q2", "")).split('-')
-        obj.th3 = str(detail.get("q3", "")).split('-')
-        obj.th4 = str(detail.get("q4", "")).split('-')
+
+        for i, j in zip(["whole", "half1", "half2", "th1", "th2", "th3", "th4"],
+                        ["score", "1h", "2h", "q1", "q2", "q3", "q4"]):
+            _ = str(detail.get(j, "")).split('-')
+            if len(_) == 2:
+                setattr(obj, i, _)
         return obj
 
     @classmethod
@@ -128,6 +127,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbBasketballSpider, ball_time='today')
+    process.crawl(VbBasketballSpider, ball_time='live')
     # 启动爬虫
     process.start()

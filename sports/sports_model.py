@@ -223,7 +223,7 @@ class ScoreData:
     def clean_data(self) -> dict:
         """清洗数据并校验数据为标准格式"""
         # 只保留值为真的
-        result_data = {k: v for k, v in self.__dict__.items() if v or v == 0}
+        result_data = {k: v for k, v in self.__dict__.items() if v or v in ["period", "score_timestamp", "score_time"]}
         if 'score_time' not in result_data and 'score_timestamp' in result_data:
             score_timestamp = result_data.get("score_timestamp")
             result_data["score_time"] = self.seconds_to_time(score_timestamp)
@@ -236,8 +236,7 @@ class ScoreData:
                 v = [int(_) for _ in j if str(_).isdigit()]
             else:
                 v = j
-            if v or v == 0:
-                new_result_data[i] = v
+            new_result_data[i] = v
         return new_result_data
 
 

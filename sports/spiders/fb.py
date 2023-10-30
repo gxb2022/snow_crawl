@@ -107,7 +107,6 @@ class FbMinix(AbcSpider):
                 callback=self.parse_detail,
                 meta={"bs_id": bs_id, "item": item, "detail_requests": True}
             )
-            print(f'发送详细请求')
 
     def gen_item_bs_data(self, one_bs_data, **kwargs):
         bs_data_obj = BsData()
