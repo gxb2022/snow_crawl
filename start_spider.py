@@ -16,7 +16,7 @@ class RunSpider:
         FbBasketballSpider, VbBasketballSpider, BtiBasketballSpider
     ]
     ball_time_list = ['live', 'today', 'tomorrow']
-    detail_requests_list = [True]
+    detail_requests_list = [False, True]
 
     @classmethod
     def run_spider(cls, spider_class, ball_time, detail_requests):
