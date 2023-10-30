@@ -14,6 +14,13 @@ REDIS_CONFIG = {
     "password": ""
 }
 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_PARAMS = {
+    'password': '',
+    'db': 10
+}
+
 BOT_NAME = 'sports'
 
 SPIDER_MODULES = ['sports.spiders']

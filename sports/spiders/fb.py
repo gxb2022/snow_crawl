@@ -12,7 +12,6 @@ class FbMinix(AbcSpider):
     official_website = "https://test.f66b88sport.com/"
 
     def yield_one_requests(self, page=1):
-        self.sports_logger.info(f'发送请求间隔{self.delay}')
         url = f'https://{self.host}/v1/match/getList'
         headers = self.get_headers()
         body = self.get_body(page)
@@ -59,25 +58,15 @@ class FbMinix(AbcSpider):
         total = raw_data.get('data', {}).get('total', 50)  # 一页50个
         size = raw_data.get('data', {}).get('size', 50)  # 当前页数量
         next_pages = math.ceil(float(total) / size)
-        if page == 1 and next_pages > 1:  # 只有这种情况才需要下一页
-            for page_num in range(2, next_pages + 1):  # 从第二页开始异步翻页
-                yield from self.yield_one_requests(page=page_num)
         bs_data_list = raw_data.get('data', {}).get('records', [])
         for one_bs_data in bs_data_list:
             item = self.item_obj()
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
-
-        now_time = time.time()
-        expend_time = now_time - self.start_timestamp - self.delay
-        self.sports_logger.warning(
-            f'数量:【{len(bs_data_list):5}】,耗时:【{expend_time:5f}】,延时{self.delay}秒后继续请求...page:{page}'
-        )
-        self.start_timestamp = now_time
-        time.sleep(self.delay)
-        yield from self.yield_one_requests()
+        if page == 1 and next_pages > 1:  # 只有这种情况才需要下一页
+            for page_num in range(2, next_pages + 1):  # 从第二页开始异步翻页
+                yield from self.yield_one_requests(page=page_num)
 
     def parse_detail(self, response):
-
         item = response.meta.get("item")
         bs_id = response.meta.get("bs_id")
         raw_data = response.json()

@@ -73,6 +73,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(FbFootballSpider, ball_time='live', detail_requests=True)
+    process.crawl(FbFootballSpider, ball_time='tomorrow', detail_requests=True)
     # 启动爬虫
     process.start()
