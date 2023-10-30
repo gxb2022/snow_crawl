@@ -70,7 +70,7 @@ class FbMinix(AbcSpider):
         now_time = time.time()
         expend_time = now_time - self.start_timestamp - self.delay
         self.sports_logger.warning(
-            f'page:{page}:【{len(bs_data_list):5}】,耗时:【{expend_time:5f}】,延时{self.delay}秒后继续请求...'
+            f'数量:【{len(bs_data_list):5}】,耗时:【{expend_time:5f}】,延时{self.delay}秒后继续请求...page:{page}'
         )
         self.start_timestamp = now_time
         time.sleep(self.delay)
