@@ -30,7 +30,7 @@ class RunSpider:
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
         process.start()
         process.stop()
-        ball_time_delay = {"live": 1, "today": 10, "tomorrow": 30}
+        ball_time_delay = {"live": 0.2, "today": 10, "tomorrow": 20}
         # 增加一个错开延时
         _delay = 1 if detail_requests else 0
         time.sleep(ball_time_delay.get(ball_time, 1) + _delay)
@@ -40,12 +40,13 @@ class RunSpider:
             p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
             p1.start()
             p1.join()
+            time.sleep(0.5)  # 添加1秒的延时
 
     def run(self):
         threads = []
         for i in self.spider_class_list:
             for j in ['live', 'today', 'tomorrow']:
-                detail_list = [False] if i.api == 'vd' else [False, True]
+                detail_list = [False] if i.api == 'vd' or j == 'tomorrow' else [False, True]
                 for detail in detail_list:
                     t = threading.Thread(target=self.process_function, args=(i, j, detail))
                     threads.append(t)
