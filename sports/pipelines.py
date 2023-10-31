@@ -49,6 +49,7 @@ class SportsPipeline:
             f'{self.ball}:{self.api}:{self.ball_time}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp}
         )
         self.pipe.execute()  # 存在网络延时 实时保存
+        spider.sports_logger.debug(f"bs_id:{bs_id}数据已保存")
         return item
 
     def save_run_state(self, spider):
@@ -77,11 +78,8 @@ class SportsPipeline:
             key = f"{self.ball}&{self.api}&{self.ball_time}"
             _ = f'【普通爬虫】'
         self.pipe.hset(name=f'spiders_run_info', key=key, value=json.dumps(run_state))
-        # 批量执行管道中的命令
         self.pipe.execute()
-        pipe_expend_time = time.time() - now_timestamp
-        spider.sports_logger.warning(
-            f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time},管道耗时{pipe_expend_time}')
+        spider.sports_logger.warning(f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time}')
 
     def close_spider(self, spider):
         self.save_run_state(spider)
