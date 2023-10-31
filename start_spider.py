@@ -19,10 +19,10 @@ from sports.spiders.vd_basketball import VdBasketballSpider
 class RunSpider:
     spider_class_list = [
         BtiFootballSpider,
-        # FbFootballSpider,
+        FbFootballSpider,
         VdFootballSpider,
         BtiBasketballSpider,
-        # FbBasketballSpider,
+        FbBasketballSpider,
         VdBasketballSpider
     ]
     ball_time_list = [
