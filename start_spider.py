@@ -9,17 +9,21 @@ from scrapy.utils.project import get_project_settings
 
 from sports.spiders.bti_football import BtiFootballSpider
 from sports.spiders.fb_football import FbFootballSpider
-from sports.spiders.vb_football import VbFootballSpider
+from sports.spiders.vd_football import VdFootballSpider
 
 from sports.spiders.bti_basketball import BtiBasketballSpider
 from sports.spiders.fb_basketball import FbBasketballSpider
-from sports.spiders.vb_basketball import VbBasketballSpider
+from sports.spiders.vd_basketball import VdBasketballSpider
 
 
 class RunSpider:
     spider_class_list = [
-        BtiFootballSpider, FbFootballSpider, VbFootballSpider,
-        BtiBasketballSpider, FbBasketballSpider, VbBasketballSpider
+        BtiFootballSpider,
+        # FbFootballSpider,
+        VdFootballSpider,
+        BtiBasketballSpider,
+        # FbBasketballSpider,
+        VdBasketballSpider
     ]
     ball_time_list = [
         "live",

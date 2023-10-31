@@ -7,7 +7,7 @@ import pytz
 from sports.spiders.abc_spider import *
 
 
-class VbMinix(AbcSpider):
+class VdMinix(AbcSpider):
     api = 'vd'
     host = 'https://vd002-we46hc-api.gzyuanlai.com'
     # 测试

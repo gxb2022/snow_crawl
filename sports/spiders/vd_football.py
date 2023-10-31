@@ -3,7 +3,7 @@
 from sports.spiders.vd import *
 
 
-class VbFootballSpider(VbMinix):
+class VdFootballSpider(VdMinix):
     ball = 'football'
     name = f'vb_football'
 
@@ -150,6 +150,6 @@ if __name__ == '__main__':
     settings = get_project_settings()
     process = CrawlerProcess(settings=settings)
     # 实例化爬虫并添加到进程中
-    process.crawl(VbFootballSpider, ball_time='today')
+    process.crawl(VdFootballSpider, ball_time='today')
     # 启动爬虫
     process.start()
