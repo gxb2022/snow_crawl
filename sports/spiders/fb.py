@@ -77,7 +77,7 @@ class FbMinix(AbcSpider):
             item['odd_data'] = self.gen_item_odd_data(one_bs_data)
             item['score_data'] = self.gen_item_score_data(one_bs_data)
             yield item
-            self.sports_logger.warning(f'解析详细请求：{bs_id}')
+            self.sports_logger.debug(f'解析详细请求：{bs_id}')
 
     def yield_detail_requests(self, one_bs_data, item):
         if self.ball_time == 'tomorrow':

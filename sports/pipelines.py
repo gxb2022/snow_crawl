@@ -36,17 +36,20 @@ class SportsPipeline:
         is_detail_data = dict(item).get("is_detail_data")
         if is_detail_data:
             self.detail_bs_id_set.add(bs_id)
-        self.save_data_to_pipe(bs_id, bs_data, odd_data, score_data)
-        return item
-
-    def save_data_to_pipe(self, bs_id, bs_data, odd_data, score_data):
+            spider_style = "detail"
+        else:
+            spider_style = "simple"
         now_timestamp = int(time.time())
         self.pipe.hset(f'{self.ball}:{self.api}:bs_data', key=bs_id, value=json.dumps(bs_data))
         self.pipe.hset(f'{self.ball}:{self.api}:score_data', key=bs_id, value=json.dumps(score_data))
-        self.pipe.hset(f'{self.ball}:{self.api}:odd_data', key=bs_id, value=json.dumps(odd_data))
-        self.pipe.zadd(f'{self.ball}:{self.api}:bs_id_data', mapping={bs_id: now_timestamp})
-        self.pipe.zadd(f'{self.ball}:{self.api}:{self.ball_time}:bs_id_data', mapping={bs_id: now_timestamp})
+        # 时效性地址
+        self.pipe.hset(f'{self.ball}:{self.api}:{spider_style}_odd_data', key=bs_id, value=json.dumps(odd_data))
+        self.pipe.zadd(f'{self.ball}:{self.api}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp})
+        self.pipe.zadd(
+            f'{self.ball}:{self.api}:{self.ball_time}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp}
+        )
         self.pipe.execute()  # 存在网络延时 实时保存
+        return item
 
     def save_run_state(self, spider):
         """保存运行状态用于检查"""
@@ -77,7 +80,8 @@ class SportsPipeline:
         # 批量执行管道中的命令
         self.pipe.execute()
         pipe_expend_time = time.time() - now_timestamp
-        spider.sports_logger.warning(f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time},管道耗时{pipe_expend_time}')
+        spider.sports_logger.warning(
+            f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time},管道耗时{pipe_expend_time}')
 
     def close_spider(self, spider):
         self.save_run_state(spider)

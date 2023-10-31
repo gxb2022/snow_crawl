@@ -24,7 +24,7 @@ NEWSPIDER_MODULE = 'sports.spiders'
 
 # 启动重试2次 422响应吗需要重试 bti
 RETRY_ENABLED = True
-RETRY_TIMES = 2
+RETRY_TIMES = 1
 RETRY_HTTP_CODES = [500, 503, 504, 403, 408, 429, 422]  # 重试的错误类型
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -109,11 +109,11 @@ TWISTED_REACTOR = 'twisted.internet.asyncioreactor.AsyncioSelectorReactor'
 LOG_ENABLED = True
 LOG_LEVEL = 'ERROR'
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 100  # 全局最大并发数
-CONCURRENT_REQUESTS_PER_DOMAIN = 10  # 单个域名最大并发数，如果下一个参数设置非0，此参数无效
-CONCURRENT_REQUESTS_PER_IP = 100  # 单个ip最大并发数
+CONCURRENT_REQUESTS = 64  # 全局最大并发数
+CONCURRENT_REQUESTS_PER_DOMAIN = 64  # 单个域名最大并发数，如果下一个参数设置非0，此参数无效
+CONCURRENT_REQUESTS_PER_IP = 0  # 单个ip最大并发数
 DOWNLOAD_DELAY = 0  # 下载延时，高并发采集时设为0
-DOWNLOAD_TIMEOUT = 8  # 超时时间设置，一般设置在10-30之间
+DOWNLOAD_TIMEOUT = 12  # 超时时间设置，一般设置在10-30之间
 
 # 禁用URL长度检查
 URLLENGTH_LIMIT = 9999  # 设置一个足够大的值，以确保不会因URL长度而被忽略 vb

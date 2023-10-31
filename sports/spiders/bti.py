@@ -97,7 +97,7 @@ class BtiMinix(AbcSpider):
             item["is_detail_data"] = True
             item['odd_data'] = self.gen_detail_item_odd_data(one_bs_data)
             yield item
-            self.sports_logger.warning(f'解析详细请求：{bs_id}')
+            self.sports_logger.debug(f'解析详细请求：{bs_id}')
 
     def gen_item_bs_data(self, one_bs_data, **kwargs):
         bs_data_obj = BsData()

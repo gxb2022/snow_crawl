@@ -14,6 +14,7 @@ class RedisControlMiddleware:
     redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     def process_request(self, request, spider):
+        return
         api = spider.api
         ball = spider.ball
         ball_time = spider.ball_time
