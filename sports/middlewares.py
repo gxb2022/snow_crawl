@@ -5,6 +5,7 @@ import time
 
 import redis
 import requests
+from scrapy.exceptions import IgnoreRequest
 from scrapy.utils.project import get_project_settings
 
 
@@ -21,9 +22,9 @@ class RedisControlMiddleware:
         result = self.redis_client.exists(key)
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
         if result == 0:
-            time.sleep(1)
+            time.sleep(5)
             print(f'不存在key:{key},忽略请求...')
-            return request
+            return IgnoreRequest
             # raise IgnoreRequest
         return None
 
