@@ -5,6 +5,7 @@ import time
 
 import redis
 import requests
+from scrapy.exceptions import IgnoreRequest
 from scrapy.utils.project import get_project_settings
 
 
@@ -23,8 +24,8 @@ class RedisControlMiddleware:
         if result == 0:
             time.sleep(5)
             print(f'不存在key:{key},忽略请求...')
-            return request
-            # raise IgnoreRequest
+            # return request
+            raise IgnoreRequest
         return None
 
 

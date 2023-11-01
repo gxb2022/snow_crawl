@@ -20,7 +20,6 @@ class FbMinix(AbcSpider):
             url=url, body=json.dumps(body), method='POST', headers=headers,
             callback=self.parse, errback=self.handle_error, meta=meta
         )
-        print(f'当前{page}')
 
     @classmethod
     def get_headers(cls):
