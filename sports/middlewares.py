@@ -3,30 +3,7 @@ import json
 import random
 import time
 
-import redis
 import requests
-from scrapy.exceptions import IgnoreRequest
-from scrapy.utils.project import get_project_settings
-
-
-class RedisControlMiddleware:
-    settings = get_project_settings()
-    redis_config = settings.get("REDIS_CONFIG", {})
-    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
-
-    def process_request(self, request, spider):
-        api = spider.api
-        ball = spider.ball
-        ball_time = spider.ball_time
-        key = f'spiders_control:{ball}:{api}:{ball_time}'
-        result = self.redis_client.exists(key)
-        # 在 spider_opened 方法中可以执行爬虫启动时的操作
-        if result == 0:
-            time.sleep(5)
-            print(f'不存在key:{key},忽略请求...')
-            # return request
-            raise IgnoreRequest
-        return None
 
 
 class SportsDownloaderMiddleware:

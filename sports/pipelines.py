@@ -20,6 +20,9 @@ class SportsPipeline:
         self.bs_id_set = set()
         self.detail_bs_id_set = set()
 
+    def close_spider(self, spider):
+        self.save_run_state(spider)
+
     def open_spider(self, spider):
         self.start_timestamp = time.time()
         self.api = spider.api
@@ -80,9 +83,6 @@ class SportsPipeline:
         self.pipe.hset(name=f'spiders_run_info', key=key, value=json.dumps(run_state))
         self.pipe.execute()
         spider.sports_logger.warning(f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time}')
-
-    def close_spider(self, spider):
-        self.save_run_state(spider)
 
 
 if __name__ == '__main__':
