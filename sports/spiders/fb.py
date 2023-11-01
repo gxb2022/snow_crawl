@@ -64,6 +64,8 @@ class FbMinix(AbcSpider):
             yield from self.handle_one_bs_data(item=item, one_bs_data=one_bs_data)
         if page == 1 and next_pages > 1:  # 只有这种情况才需要下一页
             for page_num in range(2, next_pages + 1):  # 从第二页开始异步翻页
+                if page_num >= 15:
+                    break
                 yield from self.yield_one_requests(page=page_num)
 
     def parse_detail(self, response):
