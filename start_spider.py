@@ -42,8 +42,9 @@ class RunSpider:
             process = CrawlerProcess(settings=settings)
             process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
             process.start()
-            del sys.modules['twisted.internet.reactor']
             process.stop()
+            del sys.modules['twisted.internet.reactor']
+
             if not detail_requests:
                 ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
             else:
