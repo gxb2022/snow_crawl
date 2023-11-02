@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import threading
 import multiprocessing
 import time
 
@@ -7,13 +6,12 @@ import redis
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-from sports.spiders.bti_football import BtiFootballSpider
-from sports.spiders.fb_football import FbFootballSpider
-from sports.spiders.vd_football import VdFootballSpider
-
 from sports.spiders.bti_basketball import BtiBasketballSpider
+from sports.spiders.bti_football import BtiFootballSpider
 from sports.spiders.fb_basketball import FbBasketballSpider
+from sports.spiders.fb_football import FbFootballSpider
 from sports.spiders.vd_basketball import VdBasketballSpider
+from sports.spiders.vd_football import VdFootballSpider
 
 
 class RunSpider:
@@ -43,18 +41,12 @@ class RunSpider:
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
         process.start()
         process.stop()
-
-    def process_function(self, spider_class, ball_time, detail_requests):
+        import sys
+        del sys.modules['twisted.internet.reactor']
         ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
         delay = ball_time_delay[ball_time]
-        while True:
-            p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
-            p1.start()
-            p1.join()
-            if not detail_requests:
-                time.sleep(delay)
-            else:
-                time.sleep(delay / 2)
+        time.sleep(delay)
+        cls.run_spider(spider_class, ball_time, detail_requests)
 
     def run(self):
         threads = []
@@ -62,9 +54,9 @@ class RunSpider:
             for ball_time in self.ball_time_list:
                 detail_list = [False, True]
                 for detail in detail_list:
-                    if ball_time == 'tomorrow' and detail is True:
+                    if ball_time == "tomorrow" and detail is True:
                         continue
-                    t = threading.Thread(target=self.process_function, args=(i, ball_time, detail))
+                    t = multiprocessing.Process(target=self.run_spider, args=(i, ball_time, detail))
                     threads.append(t)
         for i in threads:
             i.start()
