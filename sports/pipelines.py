@@ -2,18 +2,13 @@
 import datetime
 import json
 import time
-import redis
-from scrapy.utils.project import get_project_settings
 
 
 class SportsPipeline:
-    settings = get_project_settings()
-    redis_config = settings.get("REDIS_CONFIG", {})
-    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     def __init__(self):
         self.start_timestamp = 0
-        self.pipe = self.redis_client.pipeline()
+        self.pipe = None
         self.api = None
         self.ball = None
         self.ball_time = None
@@ -25,6 +20,7 @@ class SportsPipeline:
 
     def open_spider(self, spider):
         self.start_timestamp = time.time()
+        self.pipe = spider.redis_client.pipeline()
         self.api = spider.api
         self.ball = spider.ball
         self.ball_time = spider.ball_time

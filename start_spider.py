@@ -43,6 +43,7 @@ class RunSpider:
             process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
             process.start()
             del sys.modules['twisted.internet.reactor']
+            process.stop()
             if not detail_requests:
                 ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
             else:
@@ -50,7 +51,6 @@ class RunSpider:
 
             delay = ball_time_delay[ball_time]
             time.sleep(delay)
-            # cls.run_spider(spider_class, ball_time, detail_requests)
 
     def run(self):
         threads = []
@@ -61,6 +61,7 @@ class RunSpider:
                     if ball_time == "tomorrow" and detail is True:
                         continue
                     t = multiprocessing.Process(target=self.run_spider, args=(i, ball_time, detail))
+                    t.daemon = True  # 设置为守护进程
                     threads.append(t)
         for i in threads:
             i.start()
