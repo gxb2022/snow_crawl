@@ -52,7 +52,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         key = f'spiders_control:{self.ball}:{self.api}:{self.ball_time}'
         result = self.redis_client.exists(key)
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
-        if result == 0:
+        if result == 1:
             self.sports_logger.debug(f'不存在key:{key},忽略请求...')
             time.sleep(random.randint(5, 10))
             return
