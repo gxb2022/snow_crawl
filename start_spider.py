@@ -14,6 +14,7 @@ from sports.spiders.vd_basketball import VdBasketballSpider
 from sports.spiders.vd_football import VdFootballSpider
 import sys
 
+
 class RunSpider:
     spider_class_list = [
         BtiFootballSpider,
@@ -37,18 +38,19 @@ class RunSpider:
     # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
         settings = get_project_settings()
-        process = CrawlerProcess(settings=settings)
-        process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
-        process.start()
-        del sys.modules['twisted.internet.reactor']
-        if not detail_requests:
-            ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
-        else:
-            ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
+        while True:
+            process = CrawlerProcess(settings=settings)
+            process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
+            process.start()
+            del sys.modules['twisted.internet.reactor']
+            if not detail_requests:
+                ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
+            else:
+                ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
 
-        delay = ball_time_delay[ball_time]
-        time.sleep(delay)
-        cls.run_spider(spider_class, ball_time, detail_requests)
+            delay = ball_time_delay[ball_time]
+            time.sleep(delay)
+            # cls.run_spider(spider_class, ball_time, detail_requests)
 
     def run(self):
         threads = []
