@@ -54,7 +54,7 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
         if result == 0:
             self.sports_logger.debug(f'不存在key:{key},忽略请求...')
-            time.sleep(1)
+            time.sleep(random.randint(1, 5))
             return
         yield from self.yield_one_requests()
 
