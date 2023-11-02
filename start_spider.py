@@ -43,12 +43,13 @@ class RunSpider:
         process.stop()
         import sys
         del sys.modules['twisted.internet.reactor']
-        ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
-        delay = ball_time_delay[ball_time]
         if not detail_requests:
-            time.sleep(delay)
+            ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
         else:
-            time.sleep(1)
+            ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
+
+        delay = ball_time_delay[ball_time]
+        time.sleep(delay)
         cls.run_spider(spider_class, ball_time, detail_requests)
 
     def run(self):
