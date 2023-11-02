@@ -45,7 +45,8 @@ class RunSpider:
         del sys.modules['twisted.internet.reactor']
         ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
         delay = ball_time_delay[ball_time]
-        time.sleep(delay)
+        if not detail_requests:
+            time.sleep(delay)
         cls.run_spider(spider_class, ball_time, detail_requests)
 
     def run(self):
