@@ -47,6 +47,8 @@ class RunSpider:
         delay = ball_time_delay[ball_time]
         if not detail_requests:
             time.sleep(delay)
+        else:
+            time.sleep(1)
         cls.run_spider(spider_class, ball_time, detail_requests)
 
     def run(self):
