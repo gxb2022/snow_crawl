@@ -74,7 +74,6 @@ class VdBasketballSpider(VdMinix):
         model_period = map_odd1.get(period)
         if not model_period:
             self.sports_logger.error(f'无法提取score,raw_period:{period},{detail}')
-            model_period = period
         obj.period = model_period
         score_time = detail.get("time")
         obj.score_time = "00:00" if not score_time else score_time

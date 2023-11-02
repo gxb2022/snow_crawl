@@ -55,7 +55,7 @@ class BtiBasketballSpider(BtiMinix):
             return score_data_obj
         map_score_time = {14: 'th1', 16: 'th2', 18: 'th3', 20: 'th4'}
         score_data_obj.score_timestamp = one_bs_data[7][2]
-        score_data_obj.period = map_score_time.get(one_bs_data[7][3], str(one_bs_data[7][3]))
+        score_data_obj.period = map_score_time.get(one_bs_data[7][3])
         map_score = {
             # 'half1': 'basketballFirstHalfScore',
             # 'half2': 'basketballSecondHalfScore',
