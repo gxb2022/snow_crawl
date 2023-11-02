@@ -40,7 +40,6 @@ class RunSpider:
         process = CrawlerProcess(settings=settings)
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
         process.start()
-        process.stop()
         import sys
         del sys.modules['twisted.internet.reactor']
         if not detail_requests:
