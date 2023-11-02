@@ -36,7 +36,7 @@ class BtiFootballSpider(BtiMinix):
             return score_data_obj
         period = map_period.get(one_bs_data[7][3])
         if not period:
-            print(f'无法提取model_period，period:{period}，raw_score_data：{raw_score_data}')
+            self.sports_logger.debug(f'无法提取model_period，period:{period}，raw_score_data：{raw_score_data}')
         score_data_obj.score_timestamp = one_bs_data[7][2]
         score_data_obj.period = period
         score_data_obj.whole = [int(one_bs_data[4][0]), int(one_bs_data[4][1])]
