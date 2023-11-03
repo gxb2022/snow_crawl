@@ -13,6 +13,9 @@ from sports.spiders.fb_football import FbFootballSpider
 from sports.spiders.vd_basketball import VdBasketballSpider
 from sports.spiders.vd_football import VdFootballSpider
 import sys
+from scrapy.utils.reactor import install_reactor
+
+install_reactor('twisted.internet.asyncioreactor.AsyncioSelectorReactor')
 
 
 class RunSpider:
@@ -39,19 +42,22 @@ class RunSpider:
     def run_spider(cls, spider_class, ball_time, detail_requests):
         settings = get_project_settings()
         while True:
-            process = CrawlerProcess(settings=settings)
-            process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
-            process.start()
-            process.stop()
-            del sys.modules['twisted.internet.reactor']
+            try:
+                process = CrawlerProcess(settings=settings)
+                process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
+                process.start()
 
-            if not detail_requests:
-                ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
-            else:
-                ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
+                if "twisted.internet.reactor" in sys.modules:
+                    del sys.modules["twisted.internet.reactor"]
+                if not detail_requests:
+                    ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
+                else:
+                    ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
 
-            delay = ball_time_delay[ball_time]
-            time.sleep(delay)
+                delay = ball_time_delay[ball_time]
+                time.sleep(delay)
+            except Exception as e:
+                print(f'error 循环错误：{e}')
 
     def run(self):
         threads = []
