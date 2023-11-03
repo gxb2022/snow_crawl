@@ -34,7 +34,8 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
 
     settings = get_project_settings()
     redis_config = settings.get("REDIS_CONFIG", {})
-    redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
+    # redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
+    redis_pool = redis.ConnectionPool(**redis_config, decode_responses=True)
 
     def __init__(self, ball_time="live", detail_requests=0, **kwargs):
         super().__init__(**kwargs)
@@ -50,7 +51,9 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
 
     def start_requests(self):
         key = f'spiders_control:{self.ball}:{self.api}:{self.ball_time}'
-        result = self.redis_client.exists(key)
+        with redis.StrictRedis(connection_pool=self.redis_pool) as redis_client:
+            # 执行Redis操作，字符串会被自动解码
+            result = redis_client.exists(key)
         # 在 spider_opened 方法中可以执行爬虫启动时的操作
         if result == 0:
             self.sports_logger.debug(f'不存在key:{key},忽略请求...')
