@@ -8,6 +8,7 @@ import time
 
 import redis
 from scrapy.utils.project import get_project_settings
+from scrapy_redis.spiders import RedisSpider
 
 from sports.items import *
 from sports.logger_sports import LoggerSports
@@ -17,7 +18,8 @@ from sports.sports_model import *
 spider_path = os.path.dirname(os.path.realpath(__file__))
 
 
-class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
+class AbcSpider(RedisSpider, metaclass=abc.ABCMeta):
+    redis_key = None
     api = None
     ball = None
     host = ''
@@ -32,34 +34,33 @@ class AbcSpider(scrapy.Spider, metaclass=abc.ABCMeta):
     odd_data_obj = OddData
     score_data_obj = ScoreData
 
-    settings = get_project_settings()
-    redis_config = settings.get("REDIS_CONFIG", {})
-    # redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
-    redis_pool = redis.ConnectionPool(**redis_config, decode_responses=True)
-
     def __init__(self, ball_time="live", detail_requests=0, **kwargs):
         super().__init__(**kwargs)
         self.ball_time = ball_time
         self.detail_requests = detail_requests
         self.check_parameters()
         # 日志记录
-        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='WARNING')
+        self.sports_logger = LoggerSports(ball=self.ball, api=self.api, ball_time=self.ball_time, level='INFO')
         self.is_detail_requests = False
         self.delay = self.ball_time_delay[self.ball_time]
 
         self.start_timestamp = time.time()
 
-    def start_requests(self):
-        key = f'spiders_control:{self.ball}:{self.api}:{self.ball_time}'
-        with redis.StrictRedis(connection_pool=self.redis_pool) as redis_client:
-            # 执行Redis操作，字符串会被自动解码
-            result = redis_client.exists(key)
-        # 在 spider_opened 方法中可以执行爬虫启动时的操作
-        if result == 0:
-            self.sports_logger.debug(f'不存在key:{key},忽略请求...')
-            time.sleep(random.randint(1, 5))
-            return
+    def make_request_from_data(self, data):
+        print(f'data:{data}')
         yield from self.yield_one_requests()
+
+    # def start_requests(self):
+    #     key = f'spiders_control:{self.ball}:{self.api}:{self.ball_time}'
+    #     with redis.StrictRedis(connection_pool=self.redis_pool) as redis_client:
+    #         # 执行Redis操作，字符串会被自动解码
+    #         result = redis_client.exists(key)
+    #     # 在 spider_opened 方法中可以执行爬虫启动时的操作
+    #     if result == 1:
+    #         self.sports_logger.debug(f'不存在key:{key},忽略请求...')
+    #         time.sleep(random.randint(1, 5))
+    #         return
+    #     yield from self.yield_one_requests()
 
     @abc.abstractmethod
     def yield_one_requests(self):
