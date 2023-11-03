@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import multiprocessing
+import threading
 import time
 
 import redis
@@ -12,52 +13,39 @@ from sports.spiders.fb_basketball import FbBasketballSpider
 from sports.spiders.fb_football import FbFootballSpider
 from sports.spiders.vd_basketball import VdBasketballSpider
 from sports.spiders.vd_football import VdFootballSpider
-import sys
-from scrapy.utils.reactor import install_reactor
-
-install_reactor('twisted.internet.asyncioreactor.AsyncioSelectorReactor')
 
 
 class RunSpider:
-    spider_class_list = [
-        BtiFootballSpider,
-        FbFootballSpider,
-        VdFootballSpider,
-        BtiBasketballSpider,
-        FbBasketballSpider,
-        VdBasketballSpider
-    ]
-    ball_time_list = [
-        "live",
-        "today",
-        "tomorrow"
-    ]
+    ball_time_list = ["live", "today", "tomorrow"]
+    ball_list = ["basketball", "footabll"]
 
-    def __init__(self):
+    def __init__(self, spider_class_list):
+        self.spider_class_list = spider_class_list
         redis_config = get_project_settings().get("REDIS_CONFIG", {})
         self.redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     @classmethod
     # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
+
         settings = get_project_settings()
+        process = CrawlerProcess(settings=settings)
+        process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
+        process.start()
+
+    def process_function(self, spider_class, ball_time, detail_requests):
+
+        if not detail_requests:
+            ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
+        else:
+            ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
+        delay = ball_time_delay[ball_time]
+
         while True:
-            try:
-                process = CrawlerProcess(settings=settings)
-                process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
-                process.start()
-
-                if "twisted.internet.reactor" in sys.modules:
-                    del sys.modules["twisted.internet.reactor"]
-                if not detail_requests:
-                    ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
-                else:
-                    ball_time_delay = {"live": 0.2, "today": 2, "tomorrow": 20}
-
-                delay = ball_time_delay[ball_time]
-                time.sleep(delay)
-            except Exception as e:
-                print(f'error 循环错误：{e}')
+            p1 = multiprocessing.Process(target=self.run_spider, args=(spider_class, ball_time, detail_requests))
+            p1.start()
+            p1.join()
+            time.sleep(delay)
 
     def run(self):
         threads = []
@@ -67,8 +55,9 @@ class RunSpider:
                 for detail in detail_list:
                     if ball_time == "tomorrow" and detail is True:
                         continue
-                    t = multiprocessing.Process(target=self.run_spider, args=(i, ball_time, detail))
-                    t.daemon = True  # 设置为守护进程
+                    if i.api == 'vd' and detail is True:
+                        continue
+                    t = threading.Thread(target=self.process_function, args=(i, ball_time, detail))
                     threads.append(t)
         for i in threads:
             i.start()
@@ -77,4 +66,9 @@ class RunSpider:
 
 
 if __name__ == "__main__":
-    RunSpider().run()
+    _ = [
+        BtiFootballSpider,
+        FbFootballSpider, VdFootballSpider,
+        BtiBasketballSpider, FbBasketballSpider, VdBasketballSpider
+    ]
+    RunSpider(_).run()
