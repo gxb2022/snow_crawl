@@ -16,10 +16,15 @@ class FbMinix(AbcSpider):
         headers = self.get_headers()
         body = self.get_body(page)
         meta = {"page": page}
+        print(11111)
+        # 第一页优先级最低 第二页比第三页优先级高
+        priority = 1000 - page if page > 1 else 0
+
         yield scrapy.Request(
             url=url, body=json.dumps(body), method='POST', headers=headers,
-            callback=self.parse, errback=self.handle_error, meta=meta
+            callback=self.parse, errback=self.handle_error, meta=meta, dont_filter=True, priority=priority
         )
+        print(2222)
 
     @classmethod
     def get_headers(cls):
@@ -52,8 +57,10 @@ class FbMinix(AbcSpider):
         }
 
     def parse(self, response, **kwargs):
+
         raw_data = response.json()
         page = response.meta.get("page")
+        print(f'第几页{page}')
         self.test_save_json_data(raw_data)
         total = raw_data.get('data', {}).get('total', 50)  # 一页50个
         size = raw_data.get('data', {}).get('size', 50)  # 当前页数量

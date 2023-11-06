@@ -3,12 +3,18 @@ import datetime
 import json
 import time
 
+import redis
+from scrapy.utils.project import get_project_settings
+
 
 class SportsPipeline:
+    settings = get_project_settings()
+    redis_config = settings.get("REDIS_CONFIG", {})
+    # redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
+    redis_pool = redis.ConnectionPool(**redis_config, decode_responses=True)
 
     def __init__(self):
         self.start_timestamp = 0
-        self.pipe = None
         self.api = None
         self.ball = None
         self.ball_time = None
@@ -20,12 +26,12 @@ class SportsPipeline:
 
     def open_spider(self, spider):
         self.start_timestamp = time.time()
-        self.pipe = spider.redis_client.pipeline()
         self.api = spider.api
         self.ball = spider.ball
         self.ball_time = spider.ball_time
 
     def process_item(self, item, spider):
+
         bs_data = item['bs_data']
         odd_data = item['odd_data']
         score_data = item['score_data']
@@ -39,16 +45,19 @@ class SportsPipeline:
         else:
             spider_style = "simple"
         now_timestamp = int(time.time())
-        self.pipe.hset(f'{self.ball}:{self.api}:bs_data', key=bs_id, value=json.dumps(bs_data))
-        self.pipe.hset(f'{self.ball}:{self.api}:score_data', key=bs_id, value=json.dumps(score_data))
-        # 时效性地址
-        self.pipe.hset(f'{self.ball}:{self.api}:{spider_style}_odd_data', key=bs_id, value=json.dumps(odd_data))
-        self.pipe.zadd(f'{self.ball}:{self.api}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp})
-        self.pipe.zadd(
-            f'{self.ball}:{self.api}:{self.ball_time}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp}
-        )
-        self.pipe.execute()  # 存在网络延时 实时保存
-        spider.sports_logger.debug(f"bs_id:{bs_id}数据已保存")
+        with redis.StrictRedis(connection_pool=self.redis_pool) as redis_client:
+            # 执行Redis操作，字符串会被自动解码
+            pipe = redis_client.pipeline()
+            pipe.hset(f'{self.ball}:{self.api}:bs_data', key=bs_id, value=json.dumps(bs_data))
+            pipe.hset(f'{self.ball}:{self.api}:score_data', key=bs_id, value=json.dumps(score_data))
+            # 时效性地址
+            pipe.hset(f'{self.ball}:{self.api}:{spider_style}_odd_data', key=bs_id, value=json.dumps(odd_data))
+            pipe.zadd(f'{self.ball}:{self.api}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp})
+            pipe.zadd(
+                f'{self.ball}:{self.api}:{self.ball_time}:{spider_style}_bs_id_data', mapping={bs_id: now_timestamp}
+            )
+            pipe.execute()  # 存在网络延时 实时保存
+        spider.sports_logger.info(f"bs_id:{bs_id}数据已保存")
         return item
 
     def save_run_state(self, spider):
@@ -76,8 +85,8 @@ class SportsPipeline:
         else:
             key = f"{self.ball}&{self.api}&{self.ball_time}"
             _ = f'【普通爬虫】'
-        self.pipe.hset(name=f'spiders_run_info', key=key, value=json.dumps(run_state))
-        self.pipe.execute()
+        with redis.StrictRedis(connection_pool=self.redis_pool) as redis_client:
+            redis_client.hset(name=f'spiders_run_info', key=key, value=json.dumps(run_state))
         spider.sports_logger.warning(f'{_},总数量:[{len(self.bs_id_set)}],爬虫耗时{expend_time}')
 
 

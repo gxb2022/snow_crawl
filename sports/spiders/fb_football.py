@@ -6,6 +6,7 @@ from sports.spiders.fb import *
 class FbFootballSpider(FbMinix):
     ball = 'football'
     name = f'fb_football'
+    redis_key = f'fb_football'
     item_obj = FootballItem
     odd_data_obj = FootballOddData
     score_data_obj = FootballScoreData
