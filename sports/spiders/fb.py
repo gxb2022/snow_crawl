@@ -60,7 +60,6 @@ class FbMinix(AbcSpider):
 
         raw_data = response.json()
         page = response.meta.get("page")
-        print(f'第几页{page}')
         self.test_save_json_data(raw_data)
         total = raw_data.get('data', {}).get('total', 50)  # 一页50个
         size = raw_data.get('data', {}).get('size', 50)  # 当前页数量

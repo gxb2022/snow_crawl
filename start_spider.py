@@ -16,18 +16,19 @@ from sports.spiders.vd_football import VdFootballSpider
 
 
 class RunSpider:
+    spider_class_list = [
+        BtiFootballSpider, FbFootballSpider, VdFootballSpider,
+        BtiBasketballSpider, FbBasketballSpider, VdBasketballSpider
+    ]
     ball_time_list = ["live", "today", "tomorrow"]
-    ball_list = ["basketball", "footabll"]
 
-    def __init__(self, spider_class_list):
-        self.spider_class_list = spider_class_list
+    def __init__(self):
         redis_config = get_project_settings().get("REDIS_CONFIG", {})
         self.redis_client = redis.StrictRedis(**redis_config, decode_responses=True)
 
     @classmethod
     # 定义运行爬虫的函数
     def run_spider(cls, spider_class, ball_time, detail_requests):
-
         settings = get_project_settings()
         process = CrawlerProcess(settings=settings)
         process.crawl(spider_class, ball_time=ball_time, detail_requests=detail_requests)
@@ -55,8 +56,6 @@ class RunSpider:
                 for detail in detail_list:
                     if ball_time == "tomorrow" and detail is True:
                         continue
-                    if i.api == 'vd' and detail is True:
-                        continue
                     t = threading.Thread(target=self.process_function, args=(i, ball_time, detail))
                     threads.append(t)
         for i in threads:
@@ -66,9 +65,4 @@ class RunSpider:
 
 
 if __name__ == "__main__":
-    _ = [
-        BtiFootballSpider,
-        FbFootballSpider, VdFootballSpider,
-        BtiBasketballSpider, FbBasketballSpider, VdBasketballSpider
-    ]
-    RunSpider(_).run()
+    RunSpider().run()
