@@ -44,7 +44,6 @@ class RunSpider:
             process.start()
             process.stop()
             del sys.modules['twisted.internet.reactor']
-
             if not detail_requests:
                 ball_time_delay = {"live": 0.2, "today": 20, "tomorrow": 40}
             else:
