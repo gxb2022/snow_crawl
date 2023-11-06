@@ -5,7 +5,7 @@ from sports.spiders.vd import *
 
 class VdBasketballSpider(VdMinix):
     ball = 'basketball'
-    name = f'vb_basketball'
+    name = f'vd_basketball'
 
     item_obj = BasketballItem
     odd_data_obj = BasketballOddData
