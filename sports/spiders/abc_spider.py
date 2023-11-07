@@ -24,6 +24,7 @@ class AbcSpider(RedisSpider, metaclass=abc.ABCMeta):
     ball = None
     host = ''
 
+
     support_api_list = Api.get_api_list()
     support_ball_list = Ball.get_ball_list()
     support_ball_time_list = BallTime.get_ball_time_list()
